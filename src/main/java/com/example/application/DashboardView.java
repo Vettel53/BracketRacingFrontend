@@ -7,6 +7,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -90,9 +91,24 @@ public class DashboardView extends VerticalLayout {
     private void loadRuns() {
         List<Run> runs = repo.findAll();
         dataProvider = new ListDataProvider<>(runs);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setDataProvider(dataProvider);
+
+        // Remove all auto-generated columns by Vaadin
+        grid.removeAllColumns();
+
         // TODO: Missing id, date, and time
-        grid.setColumns("car", "driver", "track", "lane", "dial", "reaction", "sixtyFoot", "halfTrack", "fullTrack", "speed");
+        // Add each column individually and what attributes/features they will need
+        grid.addColumn(Run::getCar).setHeader("Car").setFrozen(true).setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getDriver).setHeader("Driver").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getTrack).setHeader("Track").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getLane).setHeader("Lane").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getDial).setHeader("Dial").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getReaction).setHeader("Reaction").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getSixtyFoot).setHeader("60'").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getHalfTrack).setHeader("330'").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getFullTrack).setHeader("660'").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getSpeed).setHeader("Speed").setAutoWidth(true).setSortable(true);
         grid.addComponentColumn(run -> {
             // Edit button
             Button editButton = new Button(VaadinIcon.EDIT.create());
@@ -109,23 +125,14 @@ public class DashboardView extends VerticalLayout {
             // Click listener
             deleteButton.addClickListener(event -> {
                 Run runToDelete = run;
-                // Delete run from database and the dataProvider for the grid
-                repo.delete(runToDelete);
-                dataProvider.getItems().remove(runToDelete);
-                // Refresh the grid to reflect the changes
-                dataProvider.refreshAll();
-                Notification.show("Run deleted", 3000, Notification.Position.TOP_CENTER);
-            }); // TODO: Prompt with dialog box to delete or not delete
+                // Open delete dialog and ask user to delete or not delete
+                loadConfirmDeleteDialog(runToDelete);
+            });
 
             // Return the delete and edit buttons as a HBox layout
             return new HorizontalLayout(editButton, deleteButton);
-        });
-        //updateGridLayout();
+        }).setHeader("Manage").setAutoWidth(true).setFrozenToEnd(true);
     }
-//    private void updateGridLayout() {
-//        //grid.setItems(dataProvider.getItems());
-//
-//    }
 
     private void loadRunEntryDialog() {
         // Instantiate Dialog Vaadin Box
@@ -175,7 +182,7 @@ public class DashboardView extends VerticalLayout {
             BigDecimal dialText = new BigDecimal("10.50");
             BigDecimal reactionText = new BigDecimal("0.123");
             BigDecimal sixtyFootText = new BigDecimal("1.85");
-            BigDecimal halfTrackText = new BigDecimal("7.50");
+            BigDecimal halfTrackText = new BigDecimal("7.503");
             BigDecimal fullTrackText = new BigDecimal("11.90");
             BigDecimal speedText = new BigDecimal("115.75");
 
@@ -187,7 +194,8 @@ public class DashboardView extends VerticalLayout {
                 // We can use fieldName.clear() to clear the fields, but we are testing so disabled for now
                 // Get items, add new run, and then refresh the DataProvider for the grid
                 dataProvider.getItems().add(newRun);
-                dataProvider.refreshAll();
+            // Refresh the grid to reflect the changes
+            dataProvider.refreshAll();
             Notification.show("Successfully added new run to database!");
             // TODO: Should probably clear fields here
             dialog.close();
@@ -219,14 +227,72 @@ public class DashboardView extends VerticalLayout {
         dialog.open();
 
         saveButton.addClickListener(event -> {
-            // TODO: This is where we set the new values and save them | Make sure to clear field values
-
+            // Set new values to the run to be edited
+            // TODO: Make sure to clear field values later
+            runToEdit.setDate(editDatePicker.getValue());
+            runToEdit.setTime(editTimePicker.getValue());
+            runToEdit.setCar(editCar.getValue());
+            runToEdit.setDriver(editDriver.getValue());
+            runToEdit.setTrack(editTrack.getValue());
+            runToEdit.setLane(editLane.getValue().stripTrailing());
+            runToEdit.setDial(editDial.getValue());
+            runToEdit.setReaction(editReaction.getValue());
+            runToEdit.setSixtyFoot(editSixtyFoot.getValue());
+            runToEdit.setHalfTrack(editHalfTrack.getValue());
+            runToEdit.setFullTrack(editFullTrack.getValue());
+            runToEdit.setSpeed(editSpeed.getValue());
+            // Save the edited run to the database
+            repo.save(runToEdit);
+            // Refresh the grid to reflect the changes
+            dataProvider.refreshAll();
+            grid.recalculateColumnWidths();
             dialog.close();
+
+            Notification.show("Successfully edited run!");
+            // TODO: Maybe somehow which run was edited and undo button?
         });
 
         cancelButton.addClickListener(event -> {
             Notification.show("Cancelled editing run...");
-            // TODO: Should probably clear field values here
+            // TODO: Should probably clear field values here later when not using test values
+            dialog.close();
+        });
+    }
+
+    private void loadConfirmDeleteDialog(Run runToDelete) {
+        // Instantiate Dialog Delete Box
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Are you sure you want to delete this run?");
+
+        // Call helper method to generate vetical layout
+        VerticalLayout dialogLayout = createDeleteRunDialogLayout();
+        // Add VerticalLayout to dialog box
+        dialog.add(dialogLayout);
+
+        // Add yes and no buttons to dialog footer
+        Button yesButton = new Button("Delete Run");
+        Button noButton = new Button("Cancel");
+        dialog.getFooter().add(noButton);
+        dialog.getFooter().add(yesButton);
+
+        dialog.open();
+
+        yesButton.addClickListener(event -> {
+            // Delete the run from the database
+            repo.delete(runToDelete);
+            dataProvider.getItems().remove(runToDelete);
+            // Refresh the grid to reflect the changes
+            dataProvider.refreshAll();
+
+            dialog.close();
+
+            Notification.show("Successfully deleted run!");
+            // TODO: Maybe show which run is going to be deleted? Expandable box
+            // TODO: Undo button?
+        });
+
+        noButton.addClickListener(event -> {
+            Notification.show("Cancelled deleting run...");
             dialog.close();
         });
     }
@@ -280,7 +346,7 @@ public class DashboardView extends VerticalLayout {
         editLane = new Select<>();
         editLane.setLabel("Select Lane");
         editLane.setItems("Left", "Right");
-        editLane.setValue(runToEdit.getLane()); // TODO: Not setting lane in edit
+        editLane.setValue(runToEdit.getLane());
         editDial = new BigDecimalField("Dial");
         editDial.setValue(runToEdit.getDial());
         editReaction = new BigDecimalField("Reaction");
@@ -308,5 +374,17 @@ public class DashboardView extends VerticalLayout {
 
         // Return VerticalLayout
         return dialogLayout;
+    }
+
+    private VerticalLayout createDeleteRunDialogLayout() {
+            // Initialize VerticalLayout with correct properties
+            VerticalLayout dialogLayout = new VerticalLayout();
+            dialogLayout.setPadding(false);
+            dialogLayout.setSpacing(false);
+            dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+            dialogLayout.getStyle().set("width", "24rem").set("max-width", "100%");
+
+            // Return VerticalLayout
+            return dialogLayout;
     }
 }

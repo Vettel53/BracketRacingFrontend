@@ -3,6 +3,7 @@ package com.example.application;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Digits;
 
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -22,11 +23,17 @@ public class Run {
     private String driver;
     private String track;
     private String lane;
+    @Digits(integer = 2, fraction = 3)
     private BigDecimal dial;
+    @Digits(integer = 2, fraction = 3)
     private BigDecimal reaction;
+    @Digits(integer = 2, fraction = 3)
     private BigDecimal sixtyFoot;
+    @Digits(integer = 2, fraction = 3)
     private BigDecimal halfTrack;
+    @Digits(integer = 2, fraction = 3)
     private BigDecimal fullTrack;
+    @Digits(integer = 3, fraction = 3)
     private BigDecimal speed;
 
     public Run(LocalDate date, LocalTime time, String car, String driver, String track, String lane, BigDecimal dial, BigDecimal reaction, BigDecimal sixtyFoot, BigDecimal halfTrack, BigDecimal fullTrack, BigDecimal speed) {
