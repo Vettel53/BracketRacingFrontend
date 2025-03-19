@@ -1,8 +1,11 @@
-package com.example.application;
+package com.example.application.views;
 
+import com.example.application.models.Run;
+import com.example.application.RunRepo;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -234,7 +237,7 @@ public class DashboardView extends VerticalLayout {
             runToEdit.setCar(editCar.getValue());
             runToEdit.setDriver(editDriver.getValue());
             runToEdit.setTrack(editTrack.getValue());
-            runToEdit.setLane(editLane.getValue().stripTrailing());
+            //runToEdit.setLane(comboBox.getValue());
             runToEdit.setDial(editDial.getValue());
             runToEdit.setReaction(editReaction.getValue());
             runToEdit.setSixtyFoot(editSixtyFoot.getValue());
@@ -343,10 +346,12 @@ public class DashboardView extends VerticalLayout {
         editDriver.setValue(runToEdit.getDriver());
         editTrack = new TextField("Track");
         editTrack.setValue(runToEdit.getTrack());
-        editLane = new Select<>();
-        editLane.setLabel("Select Lane");
-        editLane.setItems("Left", "Right");
-        editLane.setValue(runToEdit.getLane());
+//        editLane = new Select<>();
+//        editLane.setLabel("Select Lane");
+//        editLane.setItems("Left", "Right");
+//        editLane.setValue(runToEdit.getLane());
+        ComboBox<String> comboBox = new ComboBox<>("Tracks");
+        comboBox.setItems("EMP", "XRP", "CRP", "TRP", "PV");
         editDial = new BigDecimalField("Dial");
         editDial.setValue(runToEdit.getDial());
         editReaction = new BigDecimalField("Reaction");
@@ -362,7 +367,7 @@ public class DashboardView extends VerticalLayout {
 
         // Initialize FormLayout with correct properties
         FormLayout formLayout = new FormLayout();
-        formLayout.add(editDatePicker, editTimePicker, editCar, editDriver, editTrack, editLane, editDial, editReaction, editSixtyFoot, editHalfTrack, editFullTrack, editSpeed);
+        formLayout.add(editDatePicker, editTimePicker, editCar, editDriver, editTrack, comboBox, editDial, editReaction, editSixtyFoot, editHalfTrack, editFullTrack, editSpeed);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("600px", 2));
 
         // Initialize VerticalLayout with correct properties (FormLayout atm)

@@ -1,4 +1,4 @@
-package com.example.application;
+package com.example.application.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -6,10 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Digits;
 
 import java.math.BigDecimal;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Entity
 public class Run {
