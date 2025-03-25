@@ -1,7 +1,10 @@
 package com.example.application.views;
 
+import com.example.application.UserRepo;
+import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.RunRepo;
+import com.example.application.security.SecurityService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,6 +26,8 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.PermitAll;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,11 +35,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Route(value = "dashboard", layout = MainView.class)
+@PermitAll
 public class DashboardView extends VerticalLayout {
 
-    private final RunRepo repo;
+    private final RunRepo runRepo;
     private final Grid<Run> grid = new Grid<>(Run.class);
     private final HorizontalLayout hl = new HorizontalLayout();
+    private final SecurityService securityService;
+    private final UserRepo userRepo;
     ListDataProvider<Run> dataProvider;
 
     // Add run instance variables
@@ -65,9 +73,12 @@ public class DashboardView extends VerticalLayout {
     private BigDecimalField editFullTrack;
     private BigDecimalField editSpeed;
 
-    public DashboardView(RunRepo repo) {
-        this.repo = repo;
+    private AppUser loggedInAppUser;
 
+    public DashboardView(RunRepo runRepo, SecurityService securityService, UserRepo userRepo) {
+        this.runRepo = runRepo;
+        this.securityService = securityService;
+        this.userRepo = userRepo;
         loadAddRunEntryButton();
         add(grid);
         loadRuns();
@@ -92,7 +103,13 @@ public class DashboardView extends VerticalLayout {
     }
 
     private void loadRuns() {
-        List<Run> runs = repo.findAll();
+        UserDetails loadUserDetails = securityService.getAuthenticatedUser();
+        System.out.println(loadUserDetails);
+        String username = loadUserDetails.getUsername();
+        System.out.println(username);
+        loggedInAppUser = userRepo.findByUsername(username);//.orElse(null);
+        System.out.println(loggedInAppUser.getUsername());
+        List<Run> runs = runRepo.findByAppUser(loggedInAppUser);
         dataProvider = new ListDataProvider<>(runs);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setDataProvider(dataProvider);
@@ -190,9 +207,9 @@ public class DashboardView extends VerticalLayout {
             BigDecimal speedText = new BigDecimal("115.75");
 
             // Create a new Run object with the entered values and save it to the database
-            Run newRun = new Run(date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
+            Run newRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
                 // Save to H2 database
-                repo.save(newRun);
+                runRepo.save(newRun);
 
                 // We can use fieldName.clear() to clear the fields, but we are testing so disabled for now
                 // Get items, add new run, and then refresh the DataProvider for the grid
@@ -245,7 +262,7 @@ public class DashboardView extends VerticalLayout {
             runToEdit.setFullTrack(editFullTrack.getValue());
             runToEdit.setSpeed(editSpeed.getValue());
             // Save the edited run to the database
-            repo.save(runToEdit);
+            runRepo.save(runToEdit);
             // Refresh the grid to reflect the changes
             dataProvider.refreshAll();
             grid.recalculateColumnWidths();
@@ -282,7 +299,7 @@ public class DashboardView extends VerticalLayout {
 
         yesButton.addClickListener(event -> {
             // Delete the run from the database
-            repo.delete(runToDelete);
+            runRepo.delete(runToDelete);
             dataProvider.getItems().remove(runToDelete);
             // Refresh the grid to reflect the changes
             dataProvider.refreshAll();

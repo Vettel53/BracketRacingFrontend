@@ -1,8 +1,6 @@
 package com.example.application.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 
 import java.math.BigDecimal;
@@ -15,6 +13,12 @@ public class Run {
     @Id
     @GeneratedValue
     private Long id;
+
+    // TODO: Understand this relationship deeper
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser appUser;
+
     private LocalDate date;
     private LocalTime time;
     private String car;
@@ -34,7 +38,8 @@ public class Run {
     @Digits(integer = 3, fraction = 3)
     private BigDecimal speed;
 
-    public Run(LocalDate date, LocalTime time, String car, String driver, String track, String lane, BigDecimal dial, BigDecimal reaction, BigDecimal sixtyFoot, BigDecimal halfTrack, BigDecimal fullTrack, BigDecimal speed) {
+    public Run(AppUser appUser, LocalDate date, LocalTime time, String car, String driver, String track, String lane, BigDecimal dial, BigDecimal reaction, BigDecimal sixtyFoot, BigDecimal halfTrack, BigDecimal fullTrack, BigDecimal speed) {
+        this.appUser = appUser;
         this.date = date;
         this.time = time;
         this.car = car;
@@ -155,5 +160,13 @@ public class Run {
 
     public void setSpeed(BigDecimal speed) {
         this.speed = speed;
+    }
+
+    public AppUser getUser() {
+        return appUser;
+    }
+
+    public void setUser(AppUser appUser) {
+        this.appUser = appUser;
     }
 }
