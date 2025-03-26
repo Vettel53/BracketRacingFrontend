@@ -5,6 +5,7 @@ import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.RunRepo;
 import com.example.application.security.SecurityService;
+import com.example.application.services.DashboardService;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -27,7 +28,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -41,11 +41,10 @@ public class DashboardView extends VerticalLayout {
     private final RunRepo runRepo;
     private final Grid<Run> grid = new Grid<>(Run.class);
     private final HorizontalLayout hl = new HorizontalLayout();
-    private final SecurityService securityService;
-    private final UserRepo userRepo;
+    private final DashboardService dashboardService;
     ListDataProvider<Run> dataProvider;
 
-    // Add run instance variables
+    // "Add run" instance variables
     private DatePicker datePicker;
     private TimePicker timePicker;
     private TextField car;
@@ -59,7 +58,7 @@ public class DashboardView extends VerticalLayout {
     private BigDecimalField fullTrack;
     private BigDecimalField speed;
 
-    // Edit run instance variables
+    // "Edit Run" instance variables
     private DatePicker editDatePicker;
     private TimePicker editTimePicker;
     private TextField editCar;
@@ -75,13 +74,12 @@ public class DashboardView extends VerticalLayout {
 
     private AppUser loggedInAppUser;
 
-    public DashboardView(RunRepo runRepo, SecurityService securityService, UserRepo userRepo) {
+    public DashboardView(RunRepo runRepo, SecurityService securityService, DashboardService dashboardService, UserRepo userRepo) {
         this.runRepo = runRepo;
-        this.securityService = securityService;
-        this.userRepo = userRepo;
+        this.dashboardService = dashboardService;
         loadAddRunEntryButton();
         add(grid);
-        loadRuns();
+        loadRunsFromAppUser();
     }
 
     private void loadAddRunEntryButton() {
@@ -102,15 +100,18 @@ public class DashboardView extends VerticalLayout {
         add(hl);
     }
 
-    private void loadRuns() {
-        UserDetails loadUserDetails = securityService.getAuthenticatedUser();
-        System.out.println(loadUserDetails);
-        String username = loadUserDetails.getUsername();
-        System.out.println(username);
-        loggedInAppUser = userRepo.findByUsername(username);//.orElse(null);
-        System.out.println(loggedInAppUser.getUsername());
-        List<Run> runs = runRepo.findByAppUser(loggedInAppUser);
-        dataProvider = new ListDataProvider<>(runs);
+    private void loadRunsFromAppUser() {
+        // TODO: Some form of error efficent handling (Make experience smooth for user)
+        // Get the username from the authenticated user
+        String username = dashboardService.getAuthenticatedUserName();
+        loggedInAppUser = dashboardService.getAppUserByUsername(username);
+        System.out.println("The Logged in User has this username: " + loggedInAppUser.getUsername());
+
+        // Get all runs for the logged-in user
+        List<Run> appUserRuns = dashboardService.getAllRunsFromUser(loggedInAppUser);
+
+        // Create a data provider for the grid and set themes
+        dataProvider = new ListDataProvider<>(appUserRuns);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setDataProvider(dataProvider);
 
@@ -129,6 +130,8 @@ public class DashboardView extends VerticalLayout {
         grid.addColumn(Run::getHalfTrack).setHeader("330'").setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getFullTrack).setHeader("660'").setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getSpeed).setHeader("Speed").setAutoWidth(true).setSortable(true);
+
+        // TODO: Understand where it's referncing this run in the lamda expression
         grid.addComponentColumn(run -> {
             // Edit button
             Button editButton = new Button(VaadinIcon.EDIT.create());
@@ -165,67 +168,77 @@ public class DashboardView extends VerticalLayout {
         dialog.add(dialogLayout);
 
         // Add save and cancel buttons to dialog footer
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
-        dialog.getFooter().add(cancelButton);
-        dialog.getFooter().add(saveButton);
+        Button addRunButton = new Button("Save");
+        Button cancelRunButton = new Button("Cancel");
+        dialog.getFooter().add(cancelRunButton);
+        dialog.getFooter().add(addRunButton);
 
         dialog.open();
 
-        // Save button click listener
-        saveButton.addClickListener(event -> {
-            // Access values from the instance variables
-//            LocalDate date = datePicker.getValue();
-//            LocalTime time = timePicker.getValue();
-//            String carText = car.getValue();
-//            String driverText = driver.getValue();
-//            String trackText = track.getValue();
-//            String laneText = lane.getValue();
-//            BigDecimal dialText = dial.getValue();
-//            BigDecimal reactionText = reaction.getValue();
-//            BigDecimal sixtyFootText = sixtyFoot.getValue();
-//            BigDecimal halfTrackText = halfTrack.getValue();
-//            BigDecimal fullTrackText = fullTrack.getValue();
-//            BigDecimal speedText = speed.getValue();
+        // Save button click listener TODO: Error handling for null fields
+        addRunButton.addClickListener(event -> {
+            saveRunButtonClick();
+            clearAddEntryTextFields();
 
-            // Fake values for LocalDate and LocalTime
-            LocalDate date = LocalDate.of(2023, 10, 26); // Example date
-            LocalTime time = LocalTime.of(14, 30); // Example time
-
-            // Fake values for String fields
-            String carText = "1969 Camaro";
-            String driverText = "John Doe";
-            String trackText = "Local Dragstrip";
-            String laneText = "Left";
-
-            // Fake values for BigDecimal fields
-            BigDecimal dialText = new BigDecimal("10.50");
-            BigDecimal reactionText = new BigDecimal("0.123");
-            BigDecimal sixtyFootText = new BigDecimal("1.85");
-            BigDecimal halfTrackText = new BigDecimal("7.503");
-            BigDecimal fullTrackText = new BigDecimal("11.90");
-            BigDecimal speedText = new BigDecimal("115.75");
-
-            // Create a new Run object with the entered values and save it to the database
-            Run newRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
-                // Save to H2 database
-                runRepo.save(newRun);
-
-                // We can use fieldName.clear() to clear the fields, but we are testing so disabled for now
-                // Get items, add new run, and then refresh the DataProvider for the grid
-                dataProvider.getItems().add(newRun);
-            // Refresh the grid to reflect the changes
-            dataProvider.refreshAll();
-            Notification.show("Successfully added new run to database!");
-            // TODO: Should probably clear fields here
             dialog.close();
         });
 
-        cancelButton.addClickListener(event -> {
+        cancelRunButton.addClickListener(event -> {
             Notification.show("Cancelled adding run...");
-            // TODO: Should probably clear fields here
+            clearAddEntryTextFields();
+
             dialog.close();
         });
+
+    }
+
+    private void saveRunButtonClick() {
+        // Access values from the instance variables
+        LocalDate date = datePicker.getValue();
+        LocalTime time = timePicker.getValue();
+        String carText = car.getValue();
+        String driverText = driver.getValue();
+        String trackText = track.getValue();
+        String laneText = lane.getValue();
+        BigDecimal dialText = dial.getValue();
+        BigDecimal reactionText = reaction.getValue();
+        BigDecimal sixtyFootText = sixtyFoot.getValue();
+        BigDecimal halfTrackText = halfTrack.getValue();
+        BigDecimal fullTrackText = fullTrack.getValue();
+        BigDecimal speedText = speed.getValue();
+
+        // Create a new Run object with the entered values and save it to the database
+        // NOTE: This is commented out for testing, use this in production.
+        //Run newRun = dashboardService.constructRunEntry(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
+
+        // NOTE: Creates fake run entry with autofilled values, DO NOT use in production
+        Run newFakeRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+
+        // Get items, add new run, and then refresh the DataProvider for the grid
+        // NOTE: Commented out for testing, use this in production
+        // dataProvider.getItems().add(newRun);
+
+        // NOTE: For development mode, use above method for production.
+        dataProvider.getItems().add(newFakeRun);
+        // Refresh the grid to reflect the changes
+        dataProvider.refreshAll();
+        Notification.show("Successfully added new run to database!");
+    }
+
+    private void clearAddEntryTextFields() {
+        // Clear all text fields
+        datePicker.clear();
+        timePicker.clear();
+        car.clear();
+        driver.clear();
+        track.clear();
+        lane.clear();
+        dial.clear();
+        reaction.clear();
+        sixtyFoot.clear();
+        halfTrack.clear();
+        fullTrack.clear();
+        speed.clear();
     }
 
     private void loadEditRunDialog(Run runToEdit) {
@@ -239,44 +252,65 @@ public class DashboardView extends VerticalLayout {
         dialog.add(dialogLayout);
 
         // Add save and cancel buttons to dialog footer
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
-        dialog.getFooter().add(cancelButton);
-        dialog.getFooter().add(saveButton);
+        Button saveEditButton = new Button("Save");
+        Button cancelEditButton = new Button("Cancel");
+        dialog.getFooter().add(cancelEditButton);
+        dialog.getFooter().add(saveEditButton);
 
         dialog.open();
 
-        saveButton.addClickListener(event -> {
-            // Set new values to the run to be edited
-            // TODO: Make sure to clear field values later
-            runToEdit.setDate(editDatePicker.getValue());
-            runToEdit.setTime(editTimePicker.getValue());
-            runToEdit.setCar(editCar.getValue());
-            runToEdit.setDriver(editDriver.getValue());
-            runToEdit.setTrack(editTrack.getValue());
-            //runToEdit.setLane(comboBox.getValue());
-            runToEdit.setDial(editDial.getValue());
-            runToEdit.setReaction(editReaction.getValue());
-            runToEdit.setSixtyFoot(editSixtyFoot.getValue());
-            runToEdit.setHalfTrack(editHalfTrack.getValue());
-            runToEdit.setFullTrack(editFullTrack.getValue());
-            runToEdit.setSpeed(editSpeed.getValue());
-            // Save the edited run to the database
-            runRepo.save(runToEdit);
+        saveEditButton.addClickListener(event -> {
+            // TODO: Error handling for null values, it will produce on error.
+            // Save the edited run into database
+            dashboardService.saveEditedRun(
+                    runToEdit,
+                    editDatePicker.getValue(),
+                    editTimePicker.getValue(),
+                    editCar.getValue(),
+                    editDriver.getValue(),
+                    editTrack.getValue(),
+                    editLane.getValue(),
+                    editDial.getValue(),
+                    editReaction.getValue(),
+                    editSixtyFoot.getValue(),
+                    editHalfTrack.getValue(),
+                    editFullTrack.getValue(),
+                    editSpeed.getValue()
+            );
+
             // Refresh the grid to reflect the changes
             dataProvider.refreshAll();
             grid.recalculateColumnWidths();
-            dialog.close();
 
             Notification.show("Successfully edited run!");
+            clearEditTextFields();
+
+            dialog.close();
             // TODO: Maybe somehow which run was edited and undo button?
         });
 
-        cancelButton.addClickListener(event -> {
+        cancelEditButton.addClickListener(event -> {
             Notification.show("Cancelled editing run...");
-            // TODO: Should probably clear field values here later when not using test values
+            clearEditTextFields();
+
             dialog.close();
         });
+    }
+
+    private void clearEditTextFields() {
+        // Clear all text fields
+        editDatePicker.clear();
+        editTimePicker.clear();
+        editCar.clear();
+        editDriver.clear();
+        editTrack.clear();
+        editLane.clear();
+        editDial.clear();
+        editReaction.clear();
+        editSixtyFoot.clear();
+        editHalfTrack.clear();
+        editFullTrack.clear();
+        editSpeed.clear();
     }
 
     private void loadConfirmDeleteDialog(Run runToDelete) {
@@ -299,9 +333,10 @@ public class DashboardView extends VerticalLayout {
 
         yesButton.addClickListener(event -> {
             // Delete the run from the database
-            runRepo.delete(runToDelete);
+            dashboardService.deleteRun(runToDelete);
+
+            // Refresh the grid/data-provider to reflect the changes
             dataProvider.getItems().remove(runToDelete);
-            // Refresh the grid to reflect the changes
             dataProvider.refreshAll();
 
             dialog.close();
@@ -363,10 +398,12 @@ public class DashboardView extends VerticalLayout {
         editDriver.setValue(runToEdit.getDriver());
         editTrack = new TextField("Track");
         editTrack.setValue(runToEdit.getTrack());
-//        editLane = new Select<>();
-//        editLane.setLabel("Select Lane");
-//        editLane.setItems("Left", "Right");
-//        editLane.setValue(runToEdit.getLane());
+
+        editLane = new Select<>();
+        editLane.setLabel("Select Lane");
+        editLane.setItems("Left", "Right");
+        editLane.setValue(runToEdit.getLane());
+
         ComboBox<String> comboBox = new ComboBox<>("Tracks");
         comboBox.setItems("EMP", "XRP", "CRP", "TRP", "PV");
         editDial = new BigDecimalField("Dial");
@@ -384,7 +421,7 @@ public class DashboardView extends VerticalLayout {
 
         // Initialize FormLayout with correct properties
         FormLayout formLayout = new FormLayout();
-        formLayout.add(editDatePicker, editTimePicker, editCar, editDriver, editTrack, comboBox, editDial, editReaction, editSixtyFoot, editHalfTrack, editFullTrack, editSpeed);
+        formLayout.add(editDatePicker, editTimePicker, editCar, editDriver, editTrack, editLane, comboBox, editDial, editReaction, editSixtyFoot, editHalfTrack, editFullTrack, editSpeed);
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("600px", 2));
 
         // Initialize VerticalLayout with correct properties (FormLayout atm)
