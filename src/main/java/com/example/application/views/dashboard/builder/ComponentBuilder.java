@@ -1,47 +1,52 @@
-package com.example.application.views.dashboard;
+package com.example.application.views.dashboard.builder;
 
+import com.example.application.models.AppUser;
 import com.example.application.models.Run;
+import com.example.application.services.DashboardService;
+import com.example.application.views.dashboard.dialogs.AddDialog;
+import com.example.application.views.dashboard.dialogs.DeleteDialog;
+import com.example.application.views.dashboard.dialogs.EditDialog;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
-public class DashboardLayoutBuilder {
-    // TODO: Probably changed methods to default visibility
-    private DashboardViewListener listener;
+@UIScope
+public class ComponentBuilder {
+    private final AddDialog addDialog;
+    private final EditDialog editDialog;
+    private final DeleteDialog deleteDialog;
+    // TODO: Probably change methods to default visibility
 
-    // Inject using setter injection
-    public void setListener(DashboardViewListener listener) {
-        this.listener = listener;
+    public ComponentBuilder(AddDialog addDialog, EditDialog editDialog, DeleteDialog deleteDialog) {
+        this.addDialog = addDialog;
+        this.editDialog = editDialog;
+        this.deleteDialog = deleteDialog;
     }
 
-    public HorizontalLayout buildMainHorizontalLayout() {
+    public HorizontalLayout buildMainHorizontalLayout(AppUser loggedInAppUser) {
         // Create a new horizontal layout to hold the add run button
         HorizontalLayout hl = new HorizontalLayout();
 
         // Create add run button
-        Button addRunButton = new Button("Add");
+        Button addRunButton = new Button("Add New Run");
         addRunButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addRunButton.addClickShortcut(Key.ENTER);
 
         // Add event listener to add click event
         addRunButton.addClickListener(event -> {
             // Load the entry run dialog when addRunButton is clicked
-            //dashboardView.loadEntryRunDialog();
-            listener.onAddRunButtonClick();
+            addDialog.showAddRunDialog(loggedInAppUser);
+            Notification.show("ADD BUTTON CLICKED");
         });
 
         // Add run button to horizontalLayout
@@ -73,38 +78,35 @@ public class DashboardLayoutBuilder {
 
         // TODO: Understand where it's referncing this run in the lamda expression
         grid.addComponentColumn(run -> {
+
             // Edit button
             Button editButton = new Button(VaadinIcon.EDIT.create());
             editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             editButton.addClickListener(event -> {
                 Run runToEdit = run;
+
                 // Open the edit dialog with the existing run data
-                //dashboardView.loadEditRunDialog(runToEdit);
-                listener.onEditButtonClick(runToEdit);
+                editDialog.loadEditRunDialog(runToEdit);
                 Notification.show("Edit");
             });
 
-            // Instantiate and return a Button for delete action (adding a delete button for each row in the grid)
+            // Delete Button
             Button deleteButton = new Button(VaadinIcon.TRASH.create());
             deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             // Click listener
             deleteButton.addClickListener(event -> {
                 Run runToDelete = run;
+
                 // Open delete dialog and ask user to delete or not delete
-                //dashboardView.loadConfirmDeleteDialog(runToDelete);
-                listener.onDeleteButtonClick(runToDelete);
+                deleteDialog.loadConfirmDeleteDialog(runToDelete);
                 Notification.show("Delete");
             });
 
-            // Return the delete and edit buttons as a HBox layout
+            // Return the delete and edit buttons as a HBox layout inside each run entry
             return new HorizontalLayout(editButton, deleteButton);
         }).setHeader("Manage").setAutoWidth(true).setFrozenToEnd(true);
 
         return grid;
     }
-
-    //public Dialog c
-
-
 
 }

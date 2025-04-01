@@ -5,21 +5,29 @@ import com.example.application.UserRepo;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.security.SecurityService;
+import com.example.application.views.dashboard.DashboardView;
+import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@VaadinSessionScope
 public class DashboardService {
 
     // Dependency Injection (constructor)
     private final RunRepo runRepo;
     private final UserRepo userRepo;
     private final SecurityService securityService;
+
+    // Setter injection to access a method in dashboardView
+    private DashboardView dashboardView;
 
     public DashboardService(RunRepo runRepo, UserRepo userRepo, SecurityService securityService) {
         this.runRepo = runRepo;
@@ -77,13 +85,8 @@ public class DashboardService {
 
 
     // Used to create a new REAL run entry for the authenticated user
-    public Run constructRunEntry(AppUser loggedInAppUser, LocalDate date, LocalTime time, String carText, String driverText, String trackText, String laneText, BigDecimal dialText, BigDecimal reactionText, BigDecimal sixtyFootText, BigDecimal halfTrackText, BigDecimal fullTrackText, BigDecimal speedText) {
-        // Create a new Run object with the entered values and save it to the database
-        Run newUserCreatedRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
-        // Save to H2 database
-        runRepo.save(newUserCreatedRun);
-
-        return newUserCreatedRun;
+    public void constructRunEntry(Run runToSave) {
+        runRepo.save(runToSave);
     }
 
     public void saveEditedRun(Run runToEdit, LocalDate editedDate, LocalTime editedTime, String editedCar, String editedDriver, String editedTrack, String editedLane, BigDecimal editedDial, BigDecimal editedReaction, BigDecimal editedSixtyFoot, BigDecimal editedHalfTrack, BigDecimal editedFullTrack, BigDecimal editedSpeed) {
@@ -95,12 +98,13 @@ public class DashboardService {
         runToEdit.setDriver(editedDriver);
         runToEdit.setTrack(editedTrack);
         runToEdit.setLane(editedLane);
-        runToEdit.setDial(editedDial);
-        runToEdit.setReaction(editedReaction);
-        runToEdit.setSixtyFoot(editedSixtyFoot);
-        runToEdit.setHalfTrack(editedHalfTrack);
-        runToEdit.setFullTrack(editedFullTrack);
-        runToEdit.setSpeed(editedSpeed);
+        // Truncate values before setting to database (10.1234 -> 10.123)
+        runToEdit.setDial(truncateToValidDecimal(editedDial));
+        runToEdit.setReaction(truncateToValidDecimal(editedReaction));
+        runToEdit.setSixtyFoot(truncateToValidDecimal(editedSixtyFoot));
+        runToEdit.setHalfTrack(truncateToValidDecimal(editedHalfTrack));
+        runToEdit.setFullTrack(truncateToValidDecimal(editedFullTrack));
+        runToEdit.setSpeed(truncateToValidDecimal(editedSpeed));
 
         // Save the edited run to the database
         runRepo.save(runToEdit);
@@ -111,5 +115,26 @@ public class DashboardService {
         runRepo.delete(runToDelete);
     }
 
+    public void setDashboardView(DashboardView dashboardView) {
+        this.dashboardView = dashboardView;
+    }
+
+    // TODO: DOC THESE METHODS HEAVY
+    public void callUpdateGrid(Run createdRun){
+        dashboardView.updateGrid(createdRun);
+    }
+
+    public void callRefreshGrid() {
+        dashboardView.refreshGrid();
+    }
+
+    public void callDeleteAndUpdateGrid(Run runToDelete) {
+        dashboardView.deleteAndUpdateGridEntry(runToDelete);
+    }
+
+    public BigDecimal truncateToValidDecimal(BigDecimal decimalToTruncate) {
+        // Truncate the decimal to 3 decimal places
+        return decimalToTruncate.setScale(3, RoundingMode.DOWN);
+    }
 
 }

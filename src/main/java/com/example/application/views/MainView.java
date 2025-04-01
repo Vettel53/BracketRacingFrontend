@@ -9,6 +9,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import com.vaadin.flow.router.Route;
@@ -19,8 +20,8 @@ import java.awt.*;
 
 @Route("")
 @PermitAll
+@UIScope
 public class MainView extends AppLayout {
-
 
     private final SecurityService securityService;
 

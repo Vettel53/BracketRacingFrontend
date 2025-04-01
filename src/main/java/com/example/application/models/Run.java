@@ -1,6 +1,7 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Digits;
 
 import java.math.BigDecimal;
