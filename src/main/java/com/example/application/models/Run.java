@@ -12,7 +12,7 @@ import java.time.LocalTime;
 public class Run {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // TODO: Understand this relationship deeper
