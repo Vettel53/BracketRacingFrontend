@@ -65,7 +65,8 @@ public class DashboardView extends VerticalLayout {
         // Get all runs for the logged-in user
         List<Run> appUserRuns = dashboardService.getAllRunsFromUser(loggedInAppUser);
         // Create dataprovider which holds logged-in user runs
-        return dataProvider = new ListDataProvider<>(appUserRuns);
+        dataProvider = new ListDataProvider<>(appUserRuns);
+        return dataProvider;
     }
 
     // TODO: Document these methods heavy

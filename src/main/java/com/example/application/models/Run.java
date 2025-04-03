@@ -16,6 +16,11 @@ public class Run {
     private Long id;
 
     // TODO: Understand this relationship deeper
+    /**
+     * Holds the Foreign Key referencing the Primary Key of AppUser ->
+     * Owns the relationship (Place @ManyToOne & @JoinColumn).
+     *
+     * */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser appUser;
@@ -39,7 +44,23 @@ public class Run {
     @Digits(integer = 3, fraction = 3)
     private BigDecimal speed;
 
-    public Run(AppUser appUser, LocalDate date, LocalTime time, String car, String driver, String track, String lane, BigDecimal dial, BigDecimal reaction, BigDecimal sixtyFoot, BigDecimal halfTrack, BigDecimal fullTrack, BigDecimal speed) {
+    @OneToOne(mappedBy = "run")
+    private Weather weather;
+
+    public Run(AppUser appUser,
+               LocalDate date,
+               LocalTime time,
+               String car,
+               String driver,
+               String track,
+               String lane,
+               BigDecimal dial,
+               BigDecimal reaction,
+               BigDecimal sixtyFoot,
+               BigDecimal halfTrack,
+               BigDecimal fullTrack,
+               BigDecimal speed
+               /*Weather weather*/) {
         this.appUser = appUser;
         this.date = date;
         this.time = time;
@@ -53,6 +74,7 @@ public class Run {
         this.halfTrack = halfTrack;
         this.fullTrack = fullTrack;
         this.speed = speed;
+//        this.weather = weather;
     }
 
     public Run() {

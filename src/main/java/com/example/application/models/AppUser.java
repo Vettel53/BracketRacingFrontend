@@ -1,7 +1,6 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -15,6 +14,12 @@ public class AppUser {
 
     // TODO: Understand this relationship deeper
     //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    /**
+     * Inverse Side of relationship (Bidirectional)
+     * If you want to get a list of runs from a specific user.
+     * (mappedBy = "appUser") -> Tells JPA the relationship in Run is managed by the appUser field.
+     * JPA looks at the annotation in the Run "appUser" field to understand how join works.
+     */
     @OneToMany(mappedBy = "appUser")
     private List<Run> runDetails;
 

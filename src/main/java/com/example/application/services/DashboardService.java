@@ -4,6 +4,7 @@ import com.example.application.RunRepo;
 import com.example.application.UserRepo;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
+import com.example.application.models.Weather;
 import com.example.application.security.SecurityService;
 import com.example.application.views.dashboard.DashboardView;
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -25,14 +26,16 @@ public class DashboardService {
     private final RunRepo runRepo;
     private final UserRepo userRepo;
     private final SecurityService securityService;
+    private final WeatherService weatherService;
 
     // Setter injection to access a method in dashboardView
     private DashboardView dashboardView;
 
-    public DashboardService(RunRepo runRepo, UserRepo userRepo, SecurityService securityService) {
+    public DashboardService(RunRepo runRepo, UserRepo userRepo, SecurityService securityService, WeatherService weatherService) {
         this.runRepo = runRepo;
         this.userRepo = userRepo;
         this.securityService = securityService;
+        this.weatherService = weatherService;
     }
 
     public String getAuthenticatedUserName() {
@@ -73,6 +76,9 @@ public class DashboardService {
         BigDecimal halfTrackText = new BigDecimal("7.503");
         BigDecimal fullTrackText = new BigDecimal("11.90");
         BigDecimal speedText = new BigDecimal("115.75");
+
+        // Weather values
+        //Weather trackWeather = weatherService.getCurrentWeather(trackText);
 
         // Create a new Run object with the entered values and save it to the database
         Run newFakeRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
