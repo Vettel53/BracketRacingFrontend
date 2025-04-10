@@ -1,7 +1,6 @@
 package com.example.application.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Digits;
 
 import java.math.BigDecimal;
@@ -59,8 +58,7 @@ public class Run {
                BigDecimal sixtyFoot,
                BigDecimal halfTrack,
                BigDecimal fullTrack,
-               BigDecimal speed
-               /*Weather weather*/) {
+               BigDecimal speed) {
         this.appUser = appUser;
         this.date = date;
         this.time = time;
@@ -74,7 +72,6 @@ public class Run {
         this.halfTrack = halfTrack;
         this.fullTrack = fullTrack;
         this.speed = speed;
-//        this.weather = weather;
     }
 
     public Run() {
@@ -191,5 +188,13 @@ public class Run {
 
     public void setUser(AppUser appUser) {
         this.appUser = appUser;
+    }
+
+    public Weather getWeather() {
+        return weather;
+    }
+
+    public void setWeather(Weather weather) {
+        this.weather = weather;
     }
 }

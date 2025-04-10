@@ -14,7 +14,7 @@ public class Weather {
     private Run run;
 
     private String temperature;
-    private String humidity;
+    private String relativeHumidity;
     private String uncorrectedBarometer;
     private String correctedBarometer;
     private String windSpeed;
@@ -23,17 +23,16 @@ public class Weather {
     private String saturationPressure;
     private String vaporPressure;
     private String grains;
-    private String airDensityNoVapor;
-    private String airDensityWithVapor;
+    private String airDensityNoWaterVapor;
+    private String airDensityWithWaterVapor;
     private String densityAltitude;
 
     public Weather() {
     }
 
-    public Weather(Long id, String temperature, String humidity, String uncorrectedBarometer, String correctedBarometer, String windSpeed, String windDirection, String dewPoint, String saturationPressure, String vaporPressure, String grains, String airDensityNoVapor, String airDensityWithVapor, String densityAltitude) {
-        this.id = id;
+    public Weather(String temperature, String relativeHumidity, String uncorrectedBarometer, String correctedBarometer, String windSpeed, String windDirection, String dewPoint, String saturationPressure, String vaporPressure, String grains, String airDensityNoWaterVapor, String airDensityWithWaterVapor, String densityAltitude) {
         this.temperature = temperature;
-        this.humidity = humidity;
+        this.relativeHumidity = relativeHumidity;
         this.uncorrectedBarometer = uncorrectedBarometer;
         this.correctedBarometer = correctedBarometer;
         this.windSpeed = windSpeed;
@@ -42,8 +41,8 @@ public class Weather {
         this.saturationPressure = saturationPressure;
         this.vaporPressure = vaporPressure;
         this.grains = grains;
-        this.airDensityNoVapor = airDensityNoVapor;
-        this.airDensityWithVapor = airDensityWithVapor;
+        this.airDensityNoWaterVapor = airDensityNoWaterVapor;
+        this.airDensityWithWaterVapor = airDensityWithWaterVapor;
         this.densityAltitude = densityAltitude;
     }
 
@@ -55,6 +54,14 @@ public class Weather {
         this.id = id;
     }
 
+    public Run getRun() {
+        return run;
+    }
+
+    public void setRun(Run run) {
+        this.run = run;
+    }
+
     public String getTemperature() {
         return temperature;
     }
@@ -63,12 +70,12 @@ public class Weather {
         this.temperature = temperature;
     }
 
-    public String getHumidity() {
-        return humidity;
+    public String getRelativeHumidity() {
+        return relativeHumidity;
     }
 
-    public void setHumidity(String humidity) {
-        this.humidity = humidity;
+    public void setRelativeHumidity(String relativeHumidity) {
+        this.relativeHumidity = relativeHumidity;
     }
 
     public String getUncorrectedBarometer() {
@@ -135,20 +142,20 @@ public class Weather {
         this.grains = grains;
     }
 
-    public String getAirDensityNoVapor() {
-        return airDensityNoVapor;
+    public String getAirDensityNoWaterVapor() {
+        return airDensityNoWaterVapor;
     }
 
-    public void setAirDensityNoVapor(String airDensityNoVapor) {
-        this.airDensityNoVapor = airDensityNoVapor;
+    public void setAirDensityNoWaterVapor(String airDensityNoWaterVapor) {
+        this.airDensityNoWaterVapor = airDensityNoWaterVapor;
     }
 
-    public String getAirDensityWithVapor() {
-        return airDensityWithVapor;
+    public String getAirDensityWithWaterVapor() {
+        return airDensityWithWaterVapor;
     }
 
-    public void setAirDensityWithVapor(String airDensityWithVapor) {
-        this.airDensityWithVapor = airDensityWithVapor;
+    public void setAirDensityWithWaterVapor(String airDensityWithWaterVapor) {
+        this.airDensityWithWaterVapor = airDensityWithWaterVapor;
     }
 
     public String getDensityAltitude() {
@@ -158,4 +165,25 @@ public class Weather {
     public void setDensityAltitude(String densityAltitude) {
         this.densityAltitude = densityAltitude;
     }
+
+    @Override
+    public String toString() {
+        return "Weather{" +
+                "id=" + id +
+                ", run=" + run +
+                ", temperature='" + temperature + '\'' +
+                ", humidity='" + relativeHumidity + '\'' +
+                ", uncorrectedBarometer='" + uncorrectedBarometer + '\'' +
+                ", correctedBarometer='" + correctedBarometer + '\'' +
+                ", windSpeed='" + windSpeed + '\'' +
+                ", windDirection='" + windDirection + '\'' +
+                ", dewPoint='" + dewPoint + '\'' +
+                ", saturationPressure='" + saturationPressure + '\'' +
+                ", vaporPressure='" + vaporPressure + '\'' +
+                ", grains='" + grains + '\'' +
+                ", airDensityNoVapor='" + airDensityNoWaterVapor + '\'' +
+                ", airDensityWithVapor='" + airDensityWithWaterVapor + '\'' +
+                '}';
+    }
+
 }

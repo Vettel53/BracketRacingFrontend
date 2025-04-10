@@ -2,12 +2,12 @@ package com.example.application.services;
 
 import com.example.application.RunRepo;
 import com.example.application.UserRepo;
+import com.example.application.WeatherRepo;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.models.Weather;
 import com.example.application.security.SecurityService;
 import com.example.application.views.dashboard.DashboardView;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -25,15 +25,17 @@ public class DashboardService {
     // Dependency Injection (constructor)
     private final RunRepo runRepo;
     private final UserRepo userRepo;
+    private final WeatherRepo weatherRepo;
     private final SecurityService securityService;
     private final WeatherService weatherService;
 
     // Setter injection to access a method in dashboardView
     private DashboardView dashboardView;
 
-    public DashboardService(RunRepo runRepo, UserRepo userRepo, SecurityService securityService, WeatherService weatherService) {
+    public DashboardService(RunRepo runRepo, UserRepo userRepo, WeatherRepo weatherRepo, SecurityService securityService, WeatherService weatherService) {
         this.runRepo = runRepo;
         this.userRepo = userRepo;
+        this.weatherRepo = weatherRepo;
         this.securityService = securityService;
         this.weatherService = weatherService;
     }
@@ -66,7 +68,7 @@ public class DashboardService {
         // Fake values for String fields
         String carText = "1969 Camaro";
         String driverText = "John Doe";
-        String trackText = "Local Dragstrip";
+        String trackText = "Edinburg Motorsports Park";
         String laneText = "Left";
 
         // Fake values for BigDecimal fields
@@ -77,14 +79,23 @@ public class DashboardService {
         BigDecimal fullTrackText = new BigDecimal("11.90");
         BigDecimal speedText = new BigDecimal("115.75");
 
-        // Weather values
-        //Weather trackWeather = weatherService.getCurrentWeather(trackText);
-
         // Create a new Run object with the entered values and save it to the database
         Run newFakeRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
 
-        // Save to H2 database
+        // Save run to H2 database to create primary key ID
         runRepo.save(newFakeRun);
+
+        // Get current track weather
+        Weather trackWeather = weatherService.getCurrentWeather();
+
+        // Set trackWeather Run ID to created run
+        trackWeather.setRun(newFakeRun);
+
+        // Set the created run's weather
+        newFakeRun.setWeather(trackWeather);
+
+        // Save weather to H2 database
+        weatherRepo.save(trackWeather);
 
         return newFakeRun;
     }
