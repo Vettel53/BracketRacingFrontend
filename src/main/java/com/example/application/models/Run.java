@@ -43,7 +43,8 @@ public class Run {
     @Digits(integer = 3, fraction = 3)
     private BigDecimal speed;
 
-    @OneToOne(mappedBy = "run")
+    // Cascade.remove = when a run is deleted, the corresponding weather entry is deleted too
+    @OneToOne(mappedBy = "run", cascade = CascadeType.REMOVE)
     private Weather weather;
 
     public Run(AppUser appUser,

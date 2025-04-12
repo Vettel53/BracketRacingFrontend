@@ -52,15 +52,15 @@ public class MainView extends AppLayout {
         sideNav.addItem(
                 new SideNavItem("Dashboard", "/dashboard",
                         VaadinIcon.DASHBOARD.create()),
-                new SideNavItem("Orders", "/orders", VaadinIcon.CART.create()),
-                new SideNavItem("Customers", "/customers",
+                new SideNavItem("nil", "/orders", VaadinIcon.CART.create()),
+                new SideNavItem("nil", "/customers",
                         VaadinIcon.USER_HEART.create()),
-                new SideNavItem("Products", "/products",
+                new SideNavItem("nil", "/products",
                         VaadinIcon.PACKAGE.create()),
-                new SideNavItem("Documents", "/documents",
+                new SideNavItem("nil", "/documents",
                         VaadinIcon.RECORDS.create()),
-                new SideNavItem("Tasks", "/tasks", VaadinIcon.LIST.create()),
-                new SideNavItem("Analytics", "/analytics",
+                new SideNavItem("nil", "/tasks", VaadinIcon.LIST.create()),
+                new SideNavItem("nil", "/analytics",
                         VaadinIcon.CHART.create())
         );
         return sideNav;

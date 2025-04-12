@@ -66,25 +66,26 @@ public class AddDialog {
         addRunButton.addClickListener(event -> {
             // Create Run object from form data
             // USE THIS IN PRODUCTION FOR RUN TO BE CONSTRUCTED USING THE FORM FIELDS
-//            createdRun = new Run(
-//                    loggedInAppUser,
-//                    datePicker.getValue(),
-//                    timePicker.getValue(),
-//                    car.getValue(),
-//                    driver.getValue(),
-//                    trackSelection.getValue(),
-//                    lane.getValue(),
-//                    dashboardService.truncateToValidDecimal(dial.getValue()),
-//                    dashboardService.truncateToValidDecimal(reaction.getValue()),
-//                    dashboardService.truncateToValidDecimal(sixtyFoot.getValue()),
-//                    dashboardService.truncateToValidDecimal(halfTrack.getValue()),
-//                    dashboardService.truncateToValidDecimal(fullTrack.getValue()),
-//                    dashboardService.truncateToValidDecimal(speed.getValue())
-//            );
-//            dashboardService.constructRunEntry(createdRun);
+            // TOOD: Error handling when any field is null
+            createdRun = new Run(
+                    loggedInAppUser,
+                    datePicker.getValue(),
+                    timePicker.getValue(),
+                    car.getValue(),
+                    driver.getValue(),
+                    trackSelection.getValue(),
+                    lane.getValue(),
+                    dashboardService.truncateToValidDecimal(dial.getValue()),
+                    dashboardService.truncateToValidDecimal(reaction.getValue()),
+                    dashboardService.truncateToValidDecimal(sixtyFoot.getValue()),
+                    dashboardService.truncateToValidDecimal(halfTrack.getValue()),
+                    dashboardService.truncateToValidDecimal(fullTrack.getValue()),
+                    dashboardService.truncateToValidDecimal(speed.getValue())
+            );
+            dashboardService.constructRunEntry(createdRun);
 
             // Save the Run to the database
-            createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+            //createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
 
             // Close the dialog box
             dialog.close();

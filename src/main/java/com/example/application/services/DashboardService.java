@@ -9,6 +9,7 @@ import com.example.application.models.Weather;
 import com.example.application.security.SecurityService;
 import com.example.application.views.dashboard.DashboardView;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -103,7 +104,20 @@ public class DashboardService {
 
     // Used to create a new REAL run entry for the authenticated user
     public void constructRunEntry(Run runToSave) {
+        // Save run to generate Run ID
         runRepo.save(runToSave);
+
+        // Get current track weather
+        Weather trackWeather = weatherService.getCurrentWeather(runToSave.getTrack());
+
+        // Set trackWeather Run ID to created run
+        trackWeather.setRun(runToSave);
+
+        // Set the created run's weather
+        runToSave.setWeather(trackWeather);
+
+        // Save weather to H2 database
+        weatherRepo.save(trackWeather);
     }
 
     public void saveEditedRun(Run runToEdit, LocalDate editedDate, LocalTime editedTime, String editedCar, String editedDriver, String editedTrack, String editedLane, BigDecimal editedDial, BigDecimal editedReaction, BigDecimal editedSixtyFoot, BigDecimal editedHalfTrack, BigDecimal editedFullTrack, BigDecimal editedSpeed) {
@@ -129,6 +143,11 @@ public class DashboardService {
 
     public void deleteRun(Run runToDelete) {
         // Delete the run from the database
+        System.out.println("Run ID: " + runToDelete.getId());
+        System.out.println("Weather: " + runToDelete.getWeather());
+        if (runToDelete.getWeather() != null) {
+            System.out.println("Weather ID: " + runToDelete.getWeather().getId());
+        }
         runRepo.delete(runToDelete);
     }
 

@@ -2,22 +2,27 @@ package com.example.application.views.dashboard.builder;
 
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
-import com.example.application.services.DashboardService;
+import com.example.application.models.Weather;
 import com.example.application.views.dashboard.dialogs.AddDialog;
 import com.example.application.views.dashboard.dialogs.DeleteDialog;
 import com.example.application.views.dashboard.dialogs.EditDialog;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Stream;
 
 @Component
 @UIScope
@@ -59,13 +64,17 @@ public class ComponentBuilder {
     public Grid<Run> buildGridLayout(Grid<Run> grid, ListDataProvider<Run> dataProvider) {
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         grid.setDataProvider(dataProvider);
+        grid.setHeight("500px");
 
         // Remove all auto-generated columns by Vaadin
         grid.removeAllColumns();
 
         // TODO: Missing id, date, and time
         // Add each column individually and what attributes/features they will need
-        grid.addColumn(Run::getCar).setHeader("Car").setFrozen(true).setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getId).setHeader("ID").setFrozen(true).setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getDate).setHeader("Date").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getTime).setHeader("Time").setAutoWidth(true).setSortable(true);
+        grid.addColumn(Run::getCar).setHeader("Car").setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getDriver).setHeader("Driver").setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getTrack).setHeader("Track").setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getLane).setHeader("Lane").setAutoWidth(true).setSortable(true);
@@ -105,6 +114,55 @@ public class ComponentBuilder {
             // Return the delete and edit buttons as a HBox layout inside each run entry
             return new HorizontalLayout(editButton, deleteButton);
         }).setHeader("Manage").setAutoWidth(true).setFrozenToEnd(true);
+        
+        grid.setItemDetailsRenderer(new ComponentRenderer<>(run -> {
+            FormLayout detailsLayout = new FormLayout();
+
+            TextField temperature = new TextField("Temperature");
+            TextField relativeHumidity = new TextField("Relative Humidity");
+            TextField uncorrectedBarometer = new TextField("Uncorrected Barometer");
+            TextField correctedBarometer = new TextField("Corrected Barometer");
+            TextField windSpeed = new TextField("Wind Speed");
+            TextField windDirection = new TextField("Wind Direction");
+            TextField dewPoint = new TextField("Dew Point");
+            TextField saturationPressure = new TextField("Saturation Pressure");
+            TextField vaporPressure = new TextField("Vapor Pressure");
+            TextField grains = new TextField("Grains");
+            TextField airDensityNoWaterVapor = new TextField("Air Density W/O Water Vapor");
+            TextField airDensityWithWaterVapor = new TextField("Air Density With Water Vapor");
+            TextField densityAltitude = new TextField("Density Altitude");
+
+            // Get Weather for run
+            Weather weather = run.getWeather();
+
+            // Set Values For Fields
+            temperature.setValue(weather.getTemperature());
+            relativeHumidity.setValue(weather.getRelativeHumidity());
+            uncorrectedBarometer.setValue(weather.getUncorrectedBarometer());
+            correctedBarometer.setValue(weather.getCorrectedBarometer());
+            windSpeed.setValue(weather.getWindSpeed());
+            windDirection.setValue(weather.getWindDirection());
+            dewPoint.setValue(weather.getDewPoint());
+            saturationPressure.setValue(weather.getSaturationPressure());
+            vaporPressure.setValue(weather.getVaporPressure());
+            grains.setValue(weather.getGrains());
+            airDensityNoWaterVapor.setValue(weather.getAirDensityNoWaterVapor());
+            airDensityWithWaterVapor.setValue(weather.getAirDensityWithWaterVapor());
+            densityAltitude.setValue(weather.getDensityAltitude());
+
+            // Add Weather fields to the details layout
+            Stream.of(temperature, relativeHumidity, uncorrectedBarometer, correctedBarometer,
+                            windSpeed, windDirection, dewPoint, saturationPressure, vaporPressure,
+                            grains, airDensityNoWaterVapor, airDensityWithWaterVapor, densityAltitude)
+                    .forEach(field -> {
+                        field.setReadOnly(true);
+                        detailsLayout.add(field);
+                    });
+
+            return detailsLayout;
+        }));
+
+        grid.setDetailsVisibleOnClick(true);
 
         return grid;
     }
