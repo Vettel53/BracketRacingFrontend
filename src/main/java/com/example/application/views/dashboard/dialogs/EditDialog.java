@@ -65,7 +65,8 @@ public class EditDialog {
         dialog.open();
 
         saveEditButton.addClickListener(event -> {
-            // TODO: Error handling for null values, it will produce on error.
+            // TODO: Convert decimal fields to textfields
+            // TODO: Convert edit dialog to add dialog's formatting
             // Save the edited run into database
             dashboardService.saveEditedRun(
                     runToEdit,

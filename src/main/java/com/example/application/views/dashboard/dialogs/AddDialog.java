@@ -3,13 +3,13 @@ package com.example.application.views.dashboard.dialogs;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.services.DashboardService;
-import com.example.application.views.dashboard.builder.ComponentBuilder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -17,24 +17,30 @@ import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.spring.annotation.UIScope;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 @Component
 @UIScope
 public class AddDialog {
     // Initialize member variables
+    final String REGEX_PATTERN = "\\d{1,2}\\.\\d{1,4}";
+    final String ALLOWED_CHARACTER_PATTERN = "[0-9.]";
     DatePicker datePicker;
     TimePicker timePicker;
     TextField car;
     TextField driver;
     ComboBox<String> trackSelection;
     Select<String> lane;
-    BigDecimalField dial;
-    BigDecimalField reaction ;
-    BigDecimalField sixtyFoot;
-    BigDecimalField halfTrack;
-    BigDecimalField fullTrack;
-    BigDecimalField speed;
+    TextField dial;
+    TextField reaction ;
+    TextField sixtyFoot;
+    TextField halfTrack;
+    TextField fullTrack;
+    TextField speed;
 
     Run createdRun;
 
@@ -67,6 +73,11 @@ public class AddDialog {
             // Create Run object from form data
             // USE THIS IN PRODUCTION FOR RUN TO BE CONSTRUCTED USING THE FORM FIELDS
             // TOOD: Error handling when any field is null
+
+/*            if (checkIfFieldsAreNull()) {
+                return;
+            }
+
             createdRun = new Run(
                     loggedInAppUser,
                     datePicker.getValue(),
@@ -75,17 +86,17 @@ public class AddDialog {
                     driver.getValue(),
                     trackSelection.getValue(),
                     lane.getValue(),
-                    dashboardService.truncateToValidDecimal(dial.getValue()),
-                    dashboardService.truncateToValidDecimal(reaction.getValue()),
-                    dashboardService.truncateToValidDecimal(sixtyFoot.getValue()),
-                    dashboardService.truncateToValidDecimal(halfTrack.getValue()),
-                    dashboardService.truncateToValidDecimal(fullTrack.getValue()),
-                    dashboardService.truncateToValidDecimal(speed.getValue())
+                    new BigDecimal(dial.getValue()),
+                    new BigDecimal(reaction.getValue()),
+                    new BigDecimal(sixtyFoot.getValue()),
+                    new BigDecimal(halfTrack.getValue()),
+                    new BigDecimal(fullTrack.getValue()),
+                    new BigDecimal(speed.getValue())
             );
-            dashboardService.constructRunEntry(createdRun);
+            dashboardService.constructRunEntry(createdRun);*/
 
             // Save the Run to the database
-            //createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+            createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
 
             // Close the dialog box
             dialog.close();
@@ -104,26 +115,97 @@ public class AddDialog {
         });
     }
 
+    private boolean checkIfFieldsAreNull() {
+        Notification errorNotification = new Notification("", 3000, Notification.Position.TOP_CENTER);
+        errorNotification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        if (datePicker.getValue() == null) {
+            errorNotification.setText("Date is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (datePicker.getValue() == null) {
+            errorNotification.setText("Date is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (timePicker.getValue() == null) {
+            errorNotification.setText("Time is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (car.getValue().isEmpty() || car.isInvalid()) {
+            errorNotification.setText("Car is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (driver.getValue().isEmpty() || driver.isInvalid()) {
+            errorNotification.setText("Driver is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (trackSelection.getValue() == null) {
+            errorNotification.setText("Track is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (lane.getValue() == null) {
+            errorNotification.setText("Lane is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (dial.getValue().isEmpty() || dial.isInvalid()) {
+            errorNotification.setText("Dial is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (reaction.getValue().isEmpty() || reaction.isInvalid()) {
+            errorNotification.setText("Reaction is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (sixtyFoot.getValue().isEmpty() || sixtyFoot.isInvalid()) {
+            errorNotification.setText("60' is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (halfTrack.getValue().isEmpty() || halfTrack.isInvalid()) {
+            errorNotification.setText("330' is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (fullTrack.getValue().isEmpty() || fullTrack.isInvalid()) {
+            errorNotification.setText("660' is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        if (speed.getValue().isEmpty() || speed.isInvalid()) {
+            errorNotification.setText("Speed is an invalid value!!");
+            errorNotification.open();
+            return true;
+        }
+        return false;
+    }
+
     private VerticalLayout createRunEntryDialogLayout() {
         // Initialize instance variables
-        datePicker = new DatePicker("Date");
-        timePicker = new TimePicker("Time");
-        car = new TextField("Car");
-        driver = new TextField("Driver");
-        trackSelection = createTrackSelectionBox();
-        lane = new Select<>();
-        lane.setLabel("Select Lane");
-        lane.setItems("Left", "Right");
-        dial = new BigDecimalField("Dial");
-        reaction = new BigDecimalField("Reaction");
-        sixtyFoot = new BigDecimalField("60' Foot");
-        halfTrack = new BigDecimalField("330' Track");
-        fullTrack = new BigDecimalField("660' Track");
-        speed = new BigDecimalField("Speed MPH");
-
         // Initialize FormLayout with correct properties
         FormLayout formLayout = new FormLayout();
-        formLayout.add(datePicker, timePicker, car, driver, trackSelection, lane, dial, reaction, sixtyFoot, halfTrack, fullTrack, speed);
+
+        formLayout.add(
+                createDatePicker(),
+                createTimePicker(),
+                createCarField(),
+                createDriverField(),
+                createTrackSelectionBox(),
+                createLaneSelect(),
+                createDialField(),
+                createReactionField(),
+                createSixtyFootField(),
+                createHalfTrackField(),
+                createFullTrackField(),
+                createSpeedField()
+        );
+
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1), new FormLayout.ResponsiveStep("600px", 2));
 
         // Initialize VerticalLayout with correct properties (FormLayout atm)
@@ -137,11 +219,123 @@ public class AddDialog {
         return dialogLayout;
     }
 
+    // Bunch of Field Builder methods
+    private DatePicker createDatePicker() {
+        datePicker = new DatePicker("Date");
+        datePicker.setRequired(true);
+        return datePicker;
+    }
+
+    private TimePicker createTimePicker() {
+        timePicker = new TimePicker("Time");
+        timePicker.setRequired(true);
+        // Add constraints if needed
+        return timePicker;
+    }
+
+    private TextField createCarField() {
+        car = new TextField("Car");
+        car.setRequired(true);
+        car.setMinLength(2);
+        car.setMaxLength(50);
+        car.setErrorMessage("Car name must be between 2 and 50 characters");
+        car.setHelperText("e.g: 21' Miller Dragster");
+        return car;
+    }
+
+    private TextField createDriverField() {
+        driver = new TextField("Driver");
+        driver.setRequired(true);
+        driver.setMinLength(2);
+        driver.setMaxLength(50);
+        driver.setErrorMessage("Driver name must be between 2 and 50 characters");
+        driver.setHelperText("e.g: Verstappen");
+        return driver;
+    }
+
+    private Select<String> createLaneSelect() {
+        lane = new Select<>();
+        lane.setLabel("Select Lane");
+        lane.setItems("Left", "Right");
+        lane.setEmptySelectionAllowed(false);
+        lane.setErrorMessage("Lane must be chosen");
+        return lane;
+    }
+
+    private TextField createDialField() {
+        dial = new TextField("Dial");
+        dial.setRequired(true);
+        // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
+        // TODO: Define pattern and allowed chars as CONSTANT
+        dial.setPattern(REGEX_PATTERN);
+        dial.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        dial.setErrorMessage("Dial must be between 00.00 to 99.9999 seconds");
+        dial.setHelperText("e.g: 4.49");
+        return dial;
+    }
+
+    private TextField createReactionField() {
+        reaction = new TextField("Reaction");
+        reaction.setRequired(true);
+        // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
+        reaction.setPattern(REGEX_PATTERN);
+        reaction.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        reaction.setErrorMessage("Reaction must be between 0.0000 to 9.9999 seconds");
+        reaction.setHelperText("e.g: 0.0022");
+        return reaction;
+    }
+
+    private TextField createSixtyFootField() {
+        sixtyFoot = new TextField("60' Foot");
+        sixtyFoot.setRequired(true);
+        // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
+        sixtyFoot.setPattern(REGEX_PATTERN);
+        sixtyFoot.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        sixtyFoot.setErrorMessage("60' must be between 00.0000 to 99.9999 seconds");
+        sixtyFoot.setHelperText("e.g: 1.0374");
+        return sixtyFoot;
+    }
+
+    private TextField createHalfTrackField() {
+        halfTrack = new TextField("330' Track");
+        halfTrack.setRequired(true);
+        // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
+        halfTrack.setPattern(REGEX_PATTERN);
+        halfTrack.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        halfTrack.setErrorMessage("330' time must be between 00.0000 to 99.9999 seconds");
+        halfTrack.setHelperText("e.g: 2.9055");
+        return halfTrack;
+    }
+
+    private TextField createFullTrackField() {
+        fullTrack = new TextField("660' Track");
+        fullTrack.setRequired(true);
+        // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
+        fullTrack.setPattern(REGEX_PATTERN);
+        fullTrack.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        fullTrack.setErrorMessage("660' time must be between 00.0000 to 99.9999 seconds");
+        fullTrack.setHelperText("e.g: 4.4997");
+        return fullTrack;
+    }
+
+    private TextField createSpeedField() {
+        speed = new TextField("Speed MPH");
+        speed.setRequired(true);
+        // Must be in the 123.456 format, allowing 000.000 to 999.999
+        speed.setPattern("\\d{1,3}\\.\\d{1,4}");
+        speed.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
+        speed.setErrorMessage("Speed must be between 0.000 and 999.999 MPH");
+        speed.setHelperText("e.g: 153.11");
+        return speed;
+    }
+
     // Maybe a better way to do this?
     ComboBox<String> createTrackSelectionBox() {
         // Initialize ComboBox with tracks
-        ComboBox<String> trackSelectionBox = new ComboBox<>("Tracks");
-        trackSelectionBox.setItems(
+        trackSelection = new ComboBox<>("Tracks");
+        trackSelection.setRequired(true);
+        trackSelection.setErrorMessage("Track must be selected");
+        trackSelection.setItems(
                 "Alabama International Dragway",
                 "Atmore Dragway",
                 "Baileyton Dragstrip",
@@ -536,7 +730,7 @@ public class AddDialog {
                 "Yas Marina Circuit"
         );
 
-        return trackSelectionBox;
+        return trackSelection;
     }
 
 }

@@ -30,17 +30,17 @@ public class Run {
     private String driver;
     private String track;
     private String lane;
-    @Digits(integer = 2, fraction = 3)
+    @Digits(integer = 2, fraction = 4)
     private BigDecimal dial;
-    @Digits(integer = 2, fraction = 3)
+    @Digits(integer = 2, fraction = 4)
     private BigDecimal reaction;
-    @Digits(integer = 2, fraction = 3)
+    @Digits(integer = 2, fraction = 4)
     private BigDecimal sixtyFoot;
-    @Digits(integer = 2, fraction = 3)
+    @Digits(integer = 2, fraction = 4)
     private BigDecimal halfTrack;
-    @Digits(integer = 2, fraction = 3)
+    @Digits(integer = 2, fraction = 4)
     private BigDecimal fullTrack;
-    @Digits(integer = 3, fraction = 3)
+    @Digits(integer = 3, fraction = 4)
     private BigDecimal speed;
 
     // Cascade.remove = when a run is deleted, the corresponding weather entry is deleted too
