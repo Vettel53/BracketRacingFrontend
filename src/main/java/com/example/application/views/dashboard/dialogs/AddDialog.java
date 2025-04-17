@@ -13,22 +13,17 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.spring.annotation.UIScope;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.util.stream.Stream;
 
 @Component
 @UIScope
 public class AddDialog {
     // Initialize member variables
-    final String REGEX_PATTERN = "\\d{1,2}\\.\\d{1,4}";
-    final String ALLOWED_CHARACTER_PATTERN = "[0-9.]";
+    static final String REGEX_PATTERN = "\\d{1,2}\\.\\d{1,4}";
+    static final String ALLOWED_CHARACTER_PATTERN = "[0-9.]";
     DatePicker datePicker;
     TimePicker timePicker;
     TextField car;
@@ -266,7 +261,6 @@ public class AddDialog {
         dial = new TextField("Dial");
         dial.setRequired(true);
         // Must be in the 12.4567 format, allowing 00.0000 to 99.9999
-        // TODO: Define pattern and allowed chars as CONSTANT
         dial.setPattern(REGEX_PATTERN);
         dial.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
         dial.setErrorMessage("Dial must be between 00.00 to 99.9999 seconds");

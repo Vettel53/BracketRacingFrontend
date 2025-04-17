@@ -18,7 +18,6 @@ public class Run {
     /**
      * Holds the Foreign Key referencing the Primary Key of AppUser ->
      * Owns the relationship (Place @ManyToOne & @JoinColumn).
-     *
      * */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

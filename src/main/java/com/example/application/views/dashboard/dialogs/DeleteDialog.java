@@ -47,8 +47,6 @@ public class DeleteDialog {
 
             dialog.close();
             Notification.show("Successfully deleted run!", 3000, Notification.Position.TOP_CENTER);
-            // TODO: Maybe show which run is going to be deleted? Expandable box
-            // TODO: Undo button?
         });
 
         noButton.addClickListener(event -> {
