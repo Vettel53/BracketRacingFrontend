@@ -55,6 +55,8 @@ public class WeatherService {
     public void updateWeather(Run runToEdit) {
         
         Weather currentWeather = runToEdit.getWeather();
+
+        // Get new weather from new track
         Weather newWeather = getCurrentWeather(runToEdit.getTrack());
 
         // Set currentWeather attributes to newWeather attributes
@@ -62,7 +64,7 @@ public class WeatherService {
         currentWeather.setRelativeHumidity(newWeather.getRelativeHumidity());
         currentWeather.setUncorrectedBarometer(newWeather.getUncorrectedBarometer());
         currentWeather.setCorrectedBarometer(newWeather.getCorrectedBarometer());
-        currentWeather.setWindDirection(newWeather.getWindSpeed());
+        currentWeather.setWindSpeed(newWeather.getWindSpeed());
         currentWeather.setWindDirection(newWeather.getWindDirection());
         currentWeather.setDewPoint(newWeather.getDewPoint());
         currentWeather.setSaturationPressure(newWeather.getSaturationPressure());

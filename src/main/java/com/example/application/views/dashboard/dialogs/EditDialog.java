@@ -75,10 +75,16 @@ public class EditDialog {
 
         saveEditButton.addClickListener(event -> {
 
-            // Check if any TextFields are null
             if(checkIfEditFieldsAreNull()) {
-                return; // A TextField field was null
+                return; // An edit TextField field was null
             }
+
+            // Check if the track was edited, if so, update weather
+            String currentTrack = runToEdit.getTrack();
+            if (!currentTrack.equals(editTrack.getValue())) {
+                weatherService.updateWeather(runToEdit);
+            }
+
 
             // Save the edited run into database
             dashboardService.saveEditedRun(
@@ -96,9 +102,6 @@ public class EditDialog {
                     new BigDecimal(editFullTrack.getValue()),
                     new BigDecimal(editSpeed.getValue())
             );
-
-            // TODO: Don't call if the track was not edited
-            weatherService.updateWeather(runToEdit);
 
             // Refresh the grid to reflect the changes
             dashboardService.callRefreshGrid();
@@ -331,10 +334,10 @@ public class EditDialog {
     private TextField createEditSpeedField(Run runToEdit) {
         editSpeed = new TextField("Speed MPH");
         editSpeed.setRequired(true);
-        // Must be in the 123.456 format, allowing 000.000 to 999.999
-        editSpeed.setPattern("\\d{1,3}\\.\\d{1,4}");
+        // Must be in the 123.4567 format, allowing 000.0000 to 999.9999
+        editSpeed.setPattern(REGEX_PATTERN);
         editSpeed.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
-        editSpeed.setErrorMessage("Speed must be between 0.000 and 999.999 MPH");
+        editSpeed.setErrorMessage("Speed must be between 0.0000 and 999.9999 MPH");
         editSpeed.setHelperText("e.g: 153.11");
         editSpeed.setValue(runToEdit.getSpeed() != null ? runToEdit.getSpeed().toString() : "");
         return editSpeed;
