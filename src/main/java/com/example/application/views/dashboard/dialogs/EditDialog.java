@@ -1,7 +1,10 @@
 package com.example.application.views.dashboard.dialogs;
 
+import com.example.application.WeatherRepo;
 import com.example.application.models.Run;
+import com.example.application.models.Weather;
 import com.example.application.services.DashboardService;
+import com.example.application.services.WeatherService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -41,10 +44,14 @@ public class EditDialog {
     private TextField editSpeed;
 
     private final DashboardService dashboardService;
+    private final WeatherService weatherService;
+    private final WeatherRepo weatherRepo;
     private final AddDialog addDialog;
 
-    public EditDialog(DashboardService dashboardService, AddDialog addDialog) {
+    public EditDialog(DashboardService dashboardService, WeatherService weatherService, WeatherRepo weatherRepo, AddDialog addDialog) {
         this.dashboardService = dashboardService;
+        this.weatherService = weatherService;
+        this.weatherRepo = weatherRepo;
         this.addDialog = addDialog;
     }
 
@@ -68,9 +75,9 @@ public class EditDialog {
 
         saveEditButton.addClickListener(event -> {
 
-            // Check if any fields are null
+            // Check if any TextFields are null
             if(checkIfEditFieldsAreNull()) {
-                return; // A field was null
+                return; // A TextField field was null
             }
 
             // Save the edited run into database
@@ -89,6 +96,9 @@ public class EditDialog {
                     new BigDecimal(editFullTrack.getValue()),
                     new BigDecimal(editSpeed.getValue())
             );
+
+            // TODO: Don't call if the track was not edited
+            weatherService.updateWeather(runToEdit);
 
             // Refresh the grid to reflect the changes
             dashboardService.callRefreshGrid();
