@@ -69,7 +69,6 @@ public class ComponentBuilder {
         // Remove all auto-generated columns by Vaadin
         grid.removeAllColumns();
 
-        // TODO: Missing id, date, and time
         // Add each column individually and what attributes/features they will need
         grid.addColumn(Run::getId).setHeader("ID").setFrozen(true).setAutoWidth(true).setSortable(true);
         grid.addColumn(Run::getDate).setHeader("Date").setAutoWidth(true).setSortable(true);

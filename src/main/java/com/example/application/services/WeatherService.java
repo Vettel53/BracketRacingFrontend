@@ -1,5 +1,7 @@
 package com.example.application.services;
 
+import com.example.application.WeatherRepo;
+import com.example.application.models.Run;
 import com.example.application.models.Weather;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,8 +12,10 @@ import java.net.URI;
 public class WeatherService {
 
     private final WebClient.Builder builder;
+    private final WeatherRepo weatherRepo;
 
-    public WeatherService() {
+    public WeatherService(WeatherRepo weatherRepo) {
+        this.weatherRepo = weatherRepo;
         builder = WebClient.builder();
     }
 
@@ -48,4 +52,32 @@ public class WeatherService {
        return raceTrack.replaceAll("\\s", "%20");
     }
 
+    public void updateWeather(Run runToEdit) {
+        
+        Weather currentWeather = runToEdit.getWeather();
+
+        // Get new weather from new track
+        Weather newWeather = getCurrentWeather(runToEdit.getTrack());
+
+        // Set currentWeather attributes to newWeather attributes
+        currentWeather.setTemperature(newWeather.getTemperature());
+        currentWeather.setRelativeHumidity(newWeather.getRelativeHumidity());
+        currentWeather.setUncorrectedBarometer(newWeather.getUncorrectedBarometer());
+        currentWeather.setCorrectedBarometer(newWeather.getCorrectedBarometer());
+        currentWeather.setWindSpeed(newWeather.getWindSpeed());
+        currentWeather.setWindDirection(newWeather.getWindDirection());
+        currentWeather.setDewPoint(newWeather.getDewPoint());
+        currentWeather.setSaturationPressure(newWeather.getSaturationPressure());
+        currentWeather.setVaporPressure(newWeather.getVaporPressure());
+        currentWeather.setGrains(newWeather.getGrains());
+        currentWeather.setAirDensityNoWaterVapor(newWeather.getAirDensityNoWaterVapor());
+        currentWeather.setAirDensityWithWaterVapor(newWeather.getAirDensityWithWaterVapor());
+        currentWeather.setDensityAltitude(newWeather.getDensityAltitude());
+
+        // Set the created run's weather
+        runToEdit.setWeather(currentWeather);
+
+        // Save weather to H2 database
+        weatherRepo.save(currentWeather);
+    }
 }

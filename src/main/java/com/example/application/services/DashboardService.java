@@ -122,7 +122,6 @@ public class DashboardService {
 
     public void saveEditedRun(Run runToEdit, LocalDate editedDate, LocalTime editedTime, String editedCar, String editedDriver, String editedTrack, String editedLane, BigDecimal editedDial, BigDecimal editedReaction, BigDecimal editedSixtyFoot, BigDecimal editedHalfTrack, BigDecimal editedFullTrack, BigDecimal editedSpeed) {
         // Set new values to the run to be edited
-        // TODO: Make sure to clear field values later
         runToEdit.setDate(editedDate);
         runToEdit.setTime(editedTime);
         runToEdit.setCar(editedCar);
@@ -130,12 +129,12 @@ public class DashboardService {
         runToEdit.setTrack(editedTrack);
         runToEdit.setLane(editedLane);
         // Truncate values before setting to database (10.1234 -> 10.123)
-        runToEdit.setDial(truncateToValidDecimal(editedDial));
-        runToEdit.setReaction(truncateToValidDecimal(editedReaction));
-        runToEdit.setSixtyFoot(truncateToValidDecimal(editedSixtyFoot));
-        runToEdit.setHalfTrack(truncateToValidDecimal(editedHalfTrack));
-        runToEdit.setFullTrack(truncateToValidDecimal(editedFullTrack));
-        runToEdit.setSpeed(truncateToValidDecimal(editedSpeed));
+        runToEdit.setDial(editedDial);
+        runToEdit.setReaction(editedReaction);
+        runToEdit.setSixtyFoot(editedSixtyFoot);
+        runToEdit.setHalfTrack(editedHalfTrack);
+        runToEdit.setFullTrack(editedFullTrack);
+        runToEdit.setSpeed(editedSpeed);
 
         // Save the edited run to the database
         runRepo.save(runToEdit);
