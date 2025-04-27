@@ -4,7 +4,7 @@ import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.services.DashboardService;
 import com.example.application.views.MainView;
-import com.example.application.views.dashboard.builder.ComponentBuilder;
+import com.example.application.views.dashboard.builder.DashboardBuilder;
 import com.example.application.views.dashboard.components.RunsGrid;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -26,11 +26,11 @@ public class DashboardView extends VerticalLayout {
     ListDataProvider<Run> dataProvider;
 
     private AppUser loggedInAppUser;
-    private final ComponentBuilder componentBuilder;
+    private final DashboardBuilder dashboardBuilder;
     private final RunsGrid runsGrid;
 
-    public DashboardView(DashboardService dashboardService, ComponentBuilder componentBuilder, RunsGrid runsGrid) {
-        this.componentBuilder = componentBuilder;
+    public DashboardView(DashboardService dashboardService, DashboardBuilder dashboardBuilder, RunsGrid runsGrid) {
+        this.dashboardBuilder = dashboardBuilder;
         this.dashboardService = dashboardService;
         this.runsGrid = runsGrid;
 
@@ -47,7 +47,7 @@ public class DashboardView extends VerticalLayout {
         grid = runsGrid.getGrid(grid, dataProvider);
 
         // Add main components to grid
-        add(componentBuilder.buildMainHorizontalLayout(loggedInAppUser));
+        add(dashboardBuilder.buildMainHorizontalLayout(loggedInAppUser));
         add(grid);
     }
 

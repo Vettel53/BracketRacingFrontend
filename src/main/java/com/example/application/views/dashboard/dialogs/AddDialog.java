@@ -64,6 +64,7 @@ public class AddDialog {
         dialog.open();
 
         // Add event listener to save button
+        // TODO: Put this in another method?
         addRunButton.addClickListener(event -> {
             // Create Run object from form data
             // USE THIS IN PRODUCTION FOR RUN TO BE CONSTRUCTED USING THE FORM FIELDS

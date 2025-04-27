@@ -26,13 +26,13 @@ import java.util.stream.Stream;
 
 @Component
 @UIScope
-public class ComponentBuilder {
+public class DashboardBuilder {
     private final AddDialog addDialog;
     private final EditDialog editDialog;
     private final DeleteDialog deleteDialog;
     // TODO: Probably change methods to default visibility
 
-    public ComponentBuilder(AddDialog addDialog, EditDialog editDialog, DeleteDialog deleteDialog) {
+    public DashboardBuilder(AddDialog addDialog, EditDialog editDialog, DeleteDialog deleteDialog) {
         this.addDialog = addDialog;
         this.editDialog = editDialog;
         this.deleteDialog = deleteDialog;

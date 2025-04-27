@@ -50,9 +50,10 @@ public class MainView extends AppLayout {
     private SideNav getSideNav() {
         SideNav sideNav = new SideNav();
         sideNav.addItem(
+                new SideNavItem("Home", "/home",
+                        VaadinIcon.HOME.create()),
                 new SideNavItem("Dashboard", "/dashboard",
                         VaadinIcon.DASHBOARD.create()),
-                new SideNavItem("nil", "/orders", VaadinIcon.CART.create()),
                 new SideNavItem("nil", "/customers",
                         VaadinIcon.USER_HEART.create()),
                 new SideNavItem("nil", "/products",

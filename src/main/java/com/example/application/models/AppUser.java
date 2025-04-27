@@ -11,6 +11,7 @@ public class AppUser {
     private Long id;
 
     private String username;
+    private String password;
 
     // TODO: Understand this relationship deeper
     //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -30,6 +31,11 @@ public class AppUser {
         this.username = username;
     }
 
+    public AppUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public AppUser(String username, List<Run> runDetails) {
         this.username = username;
         this.runDetails = runDetails;
@@ -41,6 +47,14 @@ public class AppUser {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Long getId() {

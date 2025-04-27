@@ -1,5 +1,7 @@
 package com.example.application.views;
 
+import com.example.application.views.accountcreation.AccountCreationDialog;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -12,17 +14,27 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @UIScope
 public class LoginView extends VerticalLayout {
 
-    public LoginView() {
+    private final AccountCreationDialog accountCreationDialog;
+
+    public LoginView(AccountCreationDialog accountCreationDialog) {
+        this.accountCreationDialog = accountCreationDialog;
+
+        // Set view properties
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
 
+        // Create login form
         LoginForm login = new LoginForm();
         login.setAction("login");
 
-        add(
-                new H1("Bracket Racing App"),
-                login
-        );
+        // Create Account Button with listener
+        Button createAccount = new Button("Create Account");
+        createAccount.addClickListener(event -> {
+            accountCreationDialog.showAccountCreateDialog();
+        });
+
+        // Add to vertical layout
+        add(new H1("Bracket Racing App"), login, createAccount);
     }
 }
