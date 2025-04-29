@@ -134,7 +134,6 @@ public class AccountCreationBuilder {
 
             Notification.show("Cancelled Creating Account..");
             createDialog.close();
-            // TODO: Service (password validation if same, null fields).
         });
 
         return cancelAccountButton;

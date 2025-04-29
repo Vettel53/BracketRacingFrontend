@@ -28,6 +28,7 @@ import static com.example.application.views.dashboard.dialogs.AddDialog.REGEX_PA
 @Component
 @UIScope
 public class EditDialog {
+    static final String SPEED_REGEX_PATTERN = "\\d{1,3}\\.\\d{1,4}";
 
     // "Edit Run" member variables
     private DatePicker editDatePicker;
@@ -82,9 +83,13 @@ public class EditDialog {
             // Check if the track was edited, if so, update weather
             String currentTrack = runToEdit.getTrack();
             if (!currentTrack.equals(editTrack.getValue())) {
-                weatherService.updateWeather(runToEdit);
+                if(weatherService.updateWeather(runToEdit, editTrack.getValue())) { // Pass entire run and the new track
+                    System.out.println("Weather API sucessfully called!");
+                } else {
+                    Notification.show("Weather API down, please try again later...");
+                    return;
+                }
             }
-
 
             // Save the edited run into database
             dashboardService.saveEditedRun(
@@ -106,7 +111,7 @@ public class EditDialog {
             // Refresh the grid to reflect the changes
             dashboardService.callRefreshGrid();
 
-            Notification.show("Successfully edited run!", 3000, Notification.Position.TOP_CENTER);
+            Notification.show("Successfully edited run ID: " + runToEdit.getId(), 3000, Notification.Position.TOP_CENTER);
             clearEditTextFields();
 
             dialog.close();
@@ -335,7 +340,7 @@ public class EditDialog {
         editSpeed = new TextField("Speed MPH");
         editSpeed.setRequired(true);
         // Must be in the 123.4567 format, allowing 000.0000 to 999.9999
-        editSpeed.setPattern(REGEX_PATTERN);
+        editSpeed.setPattern(SPEED_REGEX_PATTERN);
         editSpeed.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
         editSpeed.setErrorMessage("Speed must be between 0.0000 and 999.9999 MPH");
         editSpeed.setHelperText("e.g: 153.1112");

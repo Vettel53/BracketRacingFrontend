@@ -93,6 +93,10 @@ public class AddDialog {
 
             // Save the Run to the database
             createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+            if (createdRun == null) {
+                Notification.show("Weather API down, please try again later...");
+                return;
+            }
 
             // Close the dialog box
             dialog.close();

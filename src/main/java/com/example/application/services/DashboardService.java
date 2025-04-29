@@ -61,6 +61,7 @@ public class DashboardService {
     }
 
     // Used to create fake run entries for ease
+    @Transactional
     public Run constructFakeRunEntry(AppUser loggedInAppUser) {
         // Fake values for LocalDate and LocalTime
         LocalDate date = LocalDate.of(2023, 10, 26); // Example date
@@ -83,11 +84,14 @@ public class DashboardService {
         // Create a new Run object with the entered values and save it to the database
         Run newFakeRun = new Run(loggedInAppUser, date, time, carText, driverText, trackText, laneText, dialText, reactionText, sixtyFootText, halfTrackText, fullTrackText, speedText);
 
-        // Save run to H2 database to create primary key ID
-        runRepo.save(newFakeRun);
-
         // Get current track weather
         Weather trackWeather = weatherService.getCurrentWeather();
+        if (trackWeather == null) {
+            return null;
+        }
+
+        // Save run to H2 database to create primary key ID
+        runRepo.save(newFakeRun);
 
         // Set trackWeather Run ID to created run
         trackWeather.setRun(newFakeRun);
@@ -103,6 +107,7 @@ public class DashboardService {
 
 
     // Used to create a new REAL run entry for the authenticated user
+    @Transactional
     public void constructRunEntry(Run runToSave) {
         // Save run to generate Run ID
         runRepo.save(runToSave);

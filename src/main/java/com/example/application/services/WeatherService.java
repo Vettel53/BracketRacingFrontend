@@ -1,8 +1,10 @@
 package com.example.application.services;
 
+import com.example.application.RunRepo;
 import com.example.application.WeatherRepo;
 import com.example.application.models.Run;
 import com.example.application.models.Weather;
+import com.vaadin.flow.component.notification.Notification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -13,38 +15,51 @@ public class WeatherService {
 
     private final WebClient.Builder builder;
     private final WeatherRepo weatherRepo;
+    private final RunRepo runRepo;
 
-    public WeatherService(WeatherRepo weatherRepo) {
+    public WeatherService(WeatherRepo weatherRepo, RunRepo runRepo) {
         this.weatherRepo = weatherRepo;
         builder = WebClient.builder();
+        this.runRepo = runRepo;
     }
 
     // Used for the fake run generation (Preset Variables)
     public Weather getCurrentWeather() {
-        URI placeHolderWeather = URI.create("http://localhost:8081/weather?trackName=Edinburg%20motorsports%20park");
+        // Try and connect to API and error handle
+        try {
+            URI placeHolderWeather = URI.create("http://localhost:8081/weather?trackName=Edinburg%20motorsports%20park");
 
-        // Return Weather Class after API Call
-        return builder.build()
-                .get()
-                .uri(placeHolderWeather)
-                .retrieve()
-                .bodyToMono(Weather.class)
-                .block();
+            // Return Weather Class after API Call
+            return builder.build()
+                    .get()
+                    .uri(placeHolderWeather)
+                    .retrieve()
+                    .bodyToMono(Weather.class)
+                    .block();
+        } catch (Exception e) {
+            System.out.println("Weather API most likely down!");
+            return null; // Return null after exception caught
+        }
     }
 
     // Used to generate real runs (User Selects)
     public Weather getCurrentWeather(String raceTrack) {
         // Reformat String and append it to URI
         raceTrack = reformatTrack(raceTrack);
-        URI weatherURI = URI.create("http://localhost:8081/weather?trackName=" + raceTrack);
+        try {
+            URI weatherURI = URI.create("http://localhost:8081/weather?trackName=" + raceTrack);
 
-        // Return Weather Class after API Call
-        return builder.build()
-                .get()
-                .uri(weatherURI)
-                .retrieve()
-                .bodyToMono(Weather.class)
-                .block();
+            // Return Weather Class after API Call
+            return builder.build()
+                    .get()
+                    .uri(weatherURI)
+                    .retrieve()
+                    .bodyToMono(Weather.class)
+                    .block();
+        } catch (Exception e) {
+            System.out.println("Weather API Most likely down!");
+            return null; // Return null after exception caught
+        }
     }
 
     // Used to reformat spaces into %20 for proper URL format
@@ -52,12 +67,15 @@ public class WeatherService {
        return raceTrack.replaceAll("\\s", "%20");
     }
 
-    public void updateWeather(Run runToEdit) {
-        
+    public boolean updateWeather(Run runToEdit, String newTrack) {
         Weather currentWeather = runToEdit.getWeather();
 
         // Get new weather from new track
-        Weather newWeather = getCurrentWeather(runToEdit.getTrack());
+        Weather newWeather = getCurrentWeather(newTrack);
+        if (newWeather == null) {
+            Notification.show("Weather API down, please try again later...");
+            return false; // Weather was not updated (API Error)
+        }
 
         // Set currentWeather attributes to newWeather attributes
         currentWeather.setTemperature(newWeather.getTemperature());
@@ -79,5 +97,7 @@ public class WeatherService {
 
         // Save weather to H2 database
         weatherRepo.save(currentWeather);
+
+        return true;
     }
 }
