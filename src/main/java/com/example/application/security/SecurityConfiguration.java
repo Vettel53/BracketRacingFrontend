@@ -4,18 +4,29 @@ import com.example.application.UserRepo;
 import com.example.application.models.AppUser;
 import com.example.application.views.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.util.List;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
+
+    private final UserRepo userRepo;
+
+    public SecurityConfiguration(UserRepo userRepo) {
+        this.userRepo = userRepo;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -34,20 +45,40 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Bean
     UserDetailsManager userDetailsManager(UserRepo userRepo) {
-        AppUser fakeUser = new AppUser("javi");
-        AppUser fakeUser2 = new AppUser("kike");
+        return new InMemoryUserDetailsManager();
+    }
 
-        userRepo.save(fakeUser);
-        userRepo.save(fakeUser2);
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        return new InMemoryUserDetailsManager(
-                User.withUsername("javi")
-                        .password("{noop}javi")
-                        .roles("USER").build(),
-                User.withUsername("kike")
-                        .password("{noop}kike")
-                        .roles("USER").build()
-        );
+    // User database initilization on application startup
+    @Bean
+    public CommandLineRunner loadInitialUsers(UserRepo userRepo, UserDetailsManager userDetailsManager, PasswordEncoder passwordEncoder) {
+        return args -> {
+            // Insert hardcoded users into the database if they don't exist already
+            if (userRepo.findByUsername("javi") == null) {
+                AppUser testUser = new AppUser();
+                testUser.setUsername("javi");
+                testUser.setPassword(passwordEncoder.encode("javi")); // Encrypt the password
+                userRepo.save(testUser);
+            }
+
+            List<AppUser> users = userRepo.findAll();
+
+            // Loop through all users
+            for (AppUser appUser : users) {
+                if (!userDetailsManager.userExists(appUser.getUsername())) {
+                    userDetailsManager.createUser(
+                            User.withUsername(appUser.getUsername())
+                                    .password(appUser.getPassword()) // Assume password is already encoded
+                                    .roles("USER") // assuming role is simple like "USER"
+                                    .build()
+                    );
+                }
+            }
+        };
     }
 
 }

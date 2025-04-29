@@ -338,7 +338,7 @@ public class EditDialog {
         editSpeed.setPattern(REGEX_PATTERN);
         editSpeed.setAllowedCharPattern(ALLOWED_CHARACTER_PATTERN);
         editSpeed.setErrorMessage("Speed must be between 0.0000 and 999.9999 MPH");
-        editSpeed.setHelperText("e.g: 153.11");
+        editSpeed.setHelperText("e.g: 153.1112");
         editSpeed.setValue(runToEdit.getSpeed() != null ? runToEdit.getSpeed().toString() : "");
         return editSpeed;
     }

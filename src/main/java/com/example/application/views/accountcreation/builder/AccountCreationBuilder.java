@@ -1,6 +1,7 @@
 package com.example.application.views.accountcreation.builder;
 
 import com.example.application.services.AccountCreationService;
+import com.example.application.services.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class AccountCreationBuilder {
 
     private final AccountCreationService accountCreationService;
+    private final UserService userService;
 
     Dialog createDialog;
     // TODO: Possible to convert to Password Field
@@ -25,8 +27,9 @@ public class AccountCreationBuilder {
     TextField accountName;
     Notification errorNotification;
 
-    public AccountCreationBuilder(AccountCreationService accountCreationService) {
+    public AccountCreationBuilder(AccountCreationService accountCreationService, UserService userService) {
         this.accountCreationService = accountCreationService;
+        this.userService = userService;
         buildErrorNotification();
     }
 
@@ -105,7 +108,15 @@ public class AccountCreationBuilder {
         Button createAccountButton = new Button("Create Account");
         createAccountButton.addClickListener(event -> {
 
+            // Check textfields for null and password mismatching
             if(checkIfAccountFieldsAreNull() || checkPasswordsMismatch()) {
+                return;
+            }
+
+            // Check if user exists
+            if (userService.userExists(accountName.getValue())) {
+                errorNotification.setText("Username already in use!");
+                errorNotification.open();
                 return;
             }
 
@@ -152,7 +163,6 @@ public class AccountCreationBuilder {
 
     private boolean checkPasswordsMismatch() {
         if (!password.getValue().equals(confirmPassword.getValue())) {
-            System.out.println(password.getValue() + " : " + confirmPassword.getValue());
             errorNotification.setText("Passwords do not match!");
             errorNotification.open();
             return true;
