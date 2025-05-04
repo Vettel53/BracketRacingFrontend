@@ -57,11 +57,11 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Bean
     public CommandLineRunner loadInitialUsers(UserRepo userRepo, UserDetailsManager userDetailsManager, PasswordEncoder passwordEncoder) {
         return args -> {
-            // Insert hardcoded users into the database if they don't exist already
+            // Insert hardcoded TEST users into the database if they don't exist already
             if (userRepo.findByUsername("javi") == null) {
                 AppUser testUser = new AppUser();
                 testUser.setUsername("javi");
-                testUser.setPassword(passwordEncoder.encode("javi")); // Encrypt the password
+                testUser.setHashedPassword(passwordEncoder.encode("javi")); // Encrypt the password
                 userRepo.save(testUser);
             }
 
@@ -72,7 +72,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                 if (!userDetailsManager.userExists(appUser.getUsername())) {
                     userDetailsManager.createUser(
                             User.withUsername(appUser.getUsername())
-                                    .password(appUser.getPassword()) // Assume password is already encoded
+                                    .password(appUser.getHashedPassword()) // Assume password is already encoded
                                     .roles("USER") // assuming role is simple like "USER"
                                     .build()
                     );

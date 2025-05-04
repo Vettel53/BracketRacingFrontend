@@ -46,7 +46,7 @@ public class DashboardService {
         if (loadUserDetails == null) {
             return null;
         }
-        System.out.println(loadUserDetails);
+        //System.out.println(loadUserDetails);
         String username = loadUserDetails.getUsername();
         System.out.println("The Authenticated User returned this username: " + username);
         return username;

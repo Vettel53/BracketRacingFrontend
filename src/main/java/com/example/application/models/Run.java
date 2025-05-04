@@ -16,8 +16,9 @@ public class Run {
 
     // TODO: Understand this relationship deeper
     /**
-     * Holds the Foreign Key referencing the Primary Key of AppUser ->
-     * Owns the relationship (Place @ManyToOne & @JoinColumn).
+     * The @ManyToOne annotation means that many Run entries can be linked to one AppUser.
+     * @ JoinColumn(name = "user_id") specifies the foreign key column in the Run table that links back to AppUser.
+     * This means in the database, the Run table will have a column user_id, storing the primary key (id) of the associated AppUser.
      * */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

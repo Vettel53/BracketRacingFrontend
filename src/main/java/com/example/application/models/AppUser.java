@@ -11,7 +11,7 @@ public class AppUser {
     private Long id;
 
     private String username;
-    private String password;
+    private String hashedPassword;
 
     // TODO: Understand this relationship deeper
     //@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -21,8 +21,8 @@ public class AppUser {
      * (mappedBy = "appUser") -> Tells JPA the relationship in Run is managed by the appUser field.
      * JPA looks at the annotation in the Run "appUser" field to understand how join works.
      */
-    @OneToMany(mappedBy = "appUser")
-    private List<Run> runDetails;
+//    @OneToMany(mappedBy = "appUser")
+//    private List<Run> runDetails;
 
     public AppUser() {
     }
@@ -31,14 +31,22 @@ public class AppUser {
         this.username = username;
     }
 
-    public AppUser(String username, String password) {
+    public AppUser(String username, String hashedPassword) {
         this.username = username;
-        this.password = password;
+        this.hashedPassword = hashedPassword;
     }
 
-    public AppUser(String username, List<Run> runDetails) {
-        this.username = username;
-        this.runDetails = runDetails;
+//    public AppUser(String username, List<Run> runDetails) {
+//        this.username = username;
+//        this.runDetails = runDetails;
+//    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -49,27 +57,19 @@ public class AppUser {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getHashedPassword() {
+        return hashedPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Run> getRunDetails() {
-        return runDetails;
-    }
-
-    public void setRunDetails(List<Run> runDetails) {
-        this.runDetails = runDetails;
-    }
+//    public List<Run> getRunDetails() {
+//        return runDetails;
+//    }
+//
+//    public void setRunDetails(List<Run> runDetails) {
+//        this.runDetails = runDetails;
+//    }
 }
