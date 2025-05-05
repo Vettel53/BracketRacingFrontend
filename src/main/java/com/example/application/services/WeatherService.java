@@ -47,7 +47,7 @@ public class WeatherService {
         // Reformat String and append it to URI
         raceTrack = reformatTrack(raceTrack);
         try {
-            URI weatherURI = URI.create("http://localhost:8081/weather?trackName=" + raceTrack);
+            URI weatherURI = URI.create("https://trackweatherapi-production.up.railway.app/weather?trackName=" + raceTrack);
 
             // Return Weather Class after API Call
             return builder.build()
