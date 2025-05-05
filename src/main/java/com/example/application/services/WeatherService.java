@@ -27,7 +27,7 @@ public class WeatherService {
     public Weather getCurrentWeather() {
         // Try and connect to API and error handle
         try {
-            URI placeHolderWeather = URI.create("http://localhost:8081/weather?trackName=Edinburg%20motorsports%20park");
+            URI placeHolderWeather = URI.create("https://trackweatherapi-production.up.railway.app/weather?trackName=Edinburg%20motorsports%20park");
 
             // Return Weather Class after API Call
             return builder.build()

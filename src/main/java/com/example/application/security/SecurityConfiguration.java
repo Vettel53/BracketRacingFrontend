@@ -31,16 +31,16 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // TODO: Permitting all users to access database --> fix
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(new AntPathRequestMatcher("/console/**"))
-                .permitAll());
+//        http.authorizeHttpRequests(auth -> auth
+//                .requestMatchers(new AntPathRequestMatcher("/console/**"))
+//                .permitAll());
 
         super.configure(http);
         setLoginView(http, LoginView.class);
 
         // TODO: Understand this? P.S : Not good
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
+//        http.csrf().disable();
+//        http.headers().frameOptions().disable();
     }
 
     @Bean

@@ -18,6 +18,8 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 @UIScope
 public class AddDialog {
@@ -70,7 +72,7 @@ public class AddDialog {
             // USE THIS IN PRODUCTION FOR RUN TO BE CONSTRUCTED USING THE FORM FIELDS
             // TOOD: Error handling when any field is null
 
-/*            if (checkIfFieldsAreNull()) {
+            if (checkIfFieldsAreNull()) {
                 return;
             }
 
@@ -89,10 +91,10 @@ public class AddDialog {
                     new BigDecimal(fullTrack.getValue()),
                     new BigDecimal(speed.getValue())
             );
-            dashboardService.constructRunEntry(createdRun);*/
+            dashboardService.constructRunEntry(createdRun);
 
-            // Save the Run to the database
-            createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+            // Save the fake Run to the database
+            // createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
             if (createdRun == null) {
                 Notification.show("Weather API down, please try again later...");
                 return;
