@@ -18,7 +18,7 @@ import jakarta.annotation.security.PermitAll;
 import java.awt.*;
 
 
-@Route("")
+//@Route("welcome")
 @PermitAll
 @UIScope
 public class MainView extends AppLayout {
@@ -50,8 +50,8 @@ public class MainView extends AppLayout {
     private SideNav getSideNav() {
         SideNav sideNav = new SideNav();
         sideNav.addItem(
-                new SideNavItem("Home", "/home",
-                        VaadinIcon.HOME.create()),
+//                new SideNavItem("Home", "/home",
+//                        VaadinIcon.HOME.create()),
                 new SideNavItem("Dashboard", "/dashboard",
                         VaadinIcon.DASHBOARD.create()),
                 new SideNavItem("nil", "/customers",

@@ -30,10 +30,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // TODO: Permitting all users to access database --> fix
-//        http.authorizeHttpRequests(auth -> auth
-//                .requestMatchers(new AntPathRequestMatcher("/console/**"))
-//                .permitAll());
+        http.authorizeHttpRequests(auth -> auth
+                //.requestMatchers(new AntPathRequestMatcher("/console/**"))
+                .requestMatchers(new AntPathRequestMatcher("/images/**")) // Allow images to load for users
+                .permitAll());
 
         super.configure(http);
         setLoginView(http, LoginView.class);

@@ -5,6 +5,8 @@ import com.example.application.WeatherRepo;
 import com.example.application.models.Run;
 import com.example.application.models.Weather;
 import com.vaadin.flow.component.notification.Notification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -16,6 +18,8 @@ public class WeatherService {
     private final WebClient.Builder builder;
     private final WeatherRepo weatherRepo;
     private final RunRepo runRepo;
+    @Autowired
+    private Environment environment;
 
     public WeatherService(WeatherRepo weatherRepo, RunRepo runRepo) {
         this.weatherRepo = weatherRepo;
@@ -23,11 +27,12 @@ public class WeatherService {
         this.runRepo = runRepo;
     }
 
-    // Used for the fake run generation (Preset Variables)
+    // Used for the fake run generation (Preset/Hardcoded Variables)
     public Weather getCurrentWeather() {
         // Try and connect to API and error handle
+        String fakeRaceTrack = "Edinburg%20motorsports%20park";
         try {
-            URI placeHolderWeather = URI.create("https://trackweatherapi-production.up.railway.app/weather?trackName=Edinburg%20motorsports%20park");
+            URI placeHolderWeather = URI.create(getAPIURL() + fakeRaceTrack);
 
             // Return Weather Class after API Call
             return builder.build()
@@ -47,7 +52,7 @@ public class WeatherService {
         // Reformat String and append it to URI
         raceTrack = reformatTrack(raceTrack);
         try {
-            URI weatherURI = URI.create("https://trackweatherapi-production.up.railway.app/weather?trackName=" + raceTrack);
+            URI weatherURI = URI.create(getAPIURL() + raceTrack);
 
             // Return Weather Class after API Call
             return builder.build()
@@ -99,5 +104,14 @@ public class WeatherService {
         weatherRepo.save(currentWeather);
 
         return true;
+    }
+
+    private String getAPIURL() {
+        if(environment.matchesProfiles("h2")) { // H2 database (testing/development most likely)
+            return "http://localhost:8081/weather?trackName=";
+        } else { // Can only be railway spring profile, in production.
+            return "https://trackweatherapi-production.up.railway.app/weather?trackName=";
+        }
+        // Note: URL's still need concatenation at end for trackName
     }
 }

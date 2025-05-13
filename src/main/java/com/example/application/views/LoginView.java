@@ -1,6 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.views.accountcreation.AccountCreationDialog;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
@@ -27,6 +28,7 @@ public class LoginView extends VerticalLayout {
         // Create login form
         LoginForm login = new LoginForm();
         login.setAction("login");
+        login.addLoginListener(l -> UI.getCurrent().navigate("/dashboard"));
 
         // Create Account Button with listener
         Button createAccount = new Button("Create Account");
@@ -36,5 +38,6 @@ public class LoginView extends VerticalLayout {
 
         // Add to vertical layout
         add(new H1("Bracket Racing App"), login, createAccount);
+
     }
 }
