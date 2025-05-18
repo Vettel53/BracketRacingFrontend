@@ -28,7 +28,7 @@ public class LoginView extends VerticalLayout {
         // Create login form
         LoginForm login = new LoginForm();
         login.setAction("login");
-        login.addLoginListener(l -> UI.getCurrent().navigate("/dashboard"));
+        //login.addLoginListener(l -> UI.getCurrent().navigate("/dashboard"));
 
         // Create Account Button with listener
         Button createAccount = new Button("Create Account");

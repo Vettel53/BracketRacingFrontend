@@ -291,13 +291,16 @@ public class HomeView extends VerticalLayout {
         useCasesContainer.add(
                 createUseCase("Weekend Racer",
                         "Track your weekend race performance and see improvement over time.",
-                        true),
+                        true,
+                        "omp logo.png"),
                 createUseCase("Professional Bracket Racer",
                         "Analyze detailed metrics to gain a competitive edge in high-stakes races.",
-                        false),
+                        false,
+                        "sparco black.jpg"),
                 createUseCase("Race Team Manager",
                         "Monitor the performance of your entire racing team in one place.",
-                        true)
+                        true,
+                        "vp racing2.jpg")
         );
 
         useCasesSection.add(sectionTitle, useCasesContainer);
@@ -305,7 +308,7 @@ public class HomeView extends VerticalLayout {
         add(anchorDiv);
     }
 
-    private HorizontalLayout createUseCase(String title, String description, boolean imageOnRight) {
+    private HorizontalLayout createUseCase(String title, String description, boolean imageOnRight, String imageName) {
         HorizontalLayout useCaseItem = new HorizontalLayout();
         useCaseItem.setWidthFull();
         useCaseItem.setSpacing(true);
@@ -320,15 +323,24 @@ public class HomeView extends VerticalLayout {
         imagePlaceholder.setWidth("200px");
         imagePlaceholder.setHeight("150px");
         imagePlaceholder.getStyle().set("background-color", "var(--lumo-contrast-10pct)");
-        imagePlaceholder.getStyle().set("border-radius", "4px");
+        imagePlaceholder.getStyle().set("border-radius", "8px");
         imagePlaceholder.getStyle().set("display", "flex");
         imagePlaceholder.getStyle().set("align-items", "center");
         imagePlaceholder.getStyle().set("justify-content", "center");
+        if (imageName != null) { // if image was specified
+            Image image = new Image("images/" + imageName, imageName);
+            image.getStyle().set("object-fit", "fill");
+            image.getStyle().set("border-radius", "8px");
+            image.setWidth("100%");
+            image.setHeight("100%");
 
-        Span placeholderText = new Span("Image");
-        placeholderText.getStyle().set("color", "var(--lumo-tertiary-text-color)");
-        placeholderText.getStyle().set("font-style", "italic");
-        imagePlaceholder.add(placeholderText);
+            imagePlaceholder.add(image);
+        } else {
+            Span placeholderText = new Span("Image");
+            placeholderText.getStyle().set("color", "var(--lumo-tertiary-text-color)");
+            placeholderText.getStyle().set("font-style", "italic");
+            imagePlaceholder.add(placeholderText);
+        }
 
         // Create text content
         VerticalLayout textContent = new VerticalLayout();

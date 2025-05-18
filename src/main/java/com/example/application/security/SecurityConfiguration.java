@@ -31,16 +31,17 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                //.requestMatchers(new AntPathRequestMatcher("/console/**"))
-                .requestMatchers(new AntPathRequestMatcher("/images/**")) // Allow images to load for users
-                .permitAll());
+                .requestMatchers(new AntPathRequestMatcher("/images/**")).permitAll()
+                //.anyRequest().authenticated() // 🔒 Require login for everything else
+        );
+        http.formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .permitAll()
+        );
 
         super.configure(http);
-        setLoginView(http, LoginView.class);
-
-        // TODO: Understand this? P.S : Not good
-//        http.csrf().disable();
-//        http.headers().frameOptions().disable();
     }
 
     @Bean
