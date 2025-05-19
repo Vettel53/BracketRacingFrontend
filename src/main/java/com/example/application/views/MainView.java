@@ -30,7 +30,7 @@ public class MainView extends AppLayout {
 
         // Maybe rewrite this to make it cleaner
         DrawerToggle toggle = new DrawerToggle();
-        H1 title = new H1("MyApp");
+        H1 title = new H1("Package θ");
         title.getStyle().set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
@@ -40,6 +40,7 @@ public class MainView extends AppLayout {
         scroller.setClassName(LumoUtility.Padding.SMALL);
 
         Button logoutButton = new Button("Logout", click -> securityService.logout());
+        logoutButton.getStyle().setMarginBottom("15px");
 
         addToDrawer(scroller, logoutButton);
         addToNavbar(toggle, title);
@@ -54,8 +55,8 @@ public class MainView extends AppLayout {
 //                        VaadinIcon.HOME.create()),
                 new SideNavItem("Dashboard", "/dashboard",
                         VaadinIcon.DASHBOARD.create()),
-                new SideNavItem("nil", "/customers",
-                        VaadinIcon.USER_HEART.create()),
+                new SideNavItem("Statistics", "/statistics",
+                        VaadinIcon.CHART_TIMELINE.create()),
                 new SideNavItem("nil", "/products",
                         VaadinIcon.PACKAGE.create()),
                 new SideNavItem("nil", "/documents",
