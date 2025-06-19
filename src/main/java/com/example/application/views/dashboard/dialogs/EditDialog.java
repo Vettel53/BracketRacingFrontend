@@ -80,10 +80,9 @@ public class EditDialog {
                 return; // An edit TextField field was null
             }
 
-            // Check if the track was edited, if so, update weather
-            String currentTrack = runToEdit.getTrack();
-            if (!currentTrack.equals(editTrack.getValue())) {
-                if(weatherService.updateWeather(runToEdit, editTrack.getValue())) { // Pass entire run and the new track
+            if (!runToEdit.getTrack().equals(editTrack.getValue()) || !runToEdit.getDate().equals(editDatePicker.getValue()) || !runToEdit.getTime().equals(editTimePicker.getValue())) {
+                // Pass new date and time values
+                if(weatherService.updateWeather(runToEdit, editTrack.getValue(), editDatePicker.getValue(), editTimePicker.getValue())) {
                     System.out.println("Weather API sucessfully called!");
                 } else {
                     Notification.show("Weather API down, please try again later...");

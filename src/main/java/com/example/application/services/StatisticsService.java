@@ -1,16 +1,15 @@
-package com.example.application.views.statistics;
+package com.example.application.services;
 
 import com.example.application.RunRepo;
 import com.example.application.UserRepo;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.security.SecurityService;
-import com.vaadin.flow.server.VaadinSession;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 public class StatisticsService {
@@ -25,7 +24,7 @@ public class StatisticsService {
         this.securityService = securityService;
     }
 
-    Double getBreakoutPercentage() {
+    public Double getBreakoutPercentage() {
         AppUser appUser = getCurrentUser();
         if (appUser == null) {
             return null;
@@ -88,5 +87,27 @@ public class StatisticsService {
 
         // TODO : Make sure "totalRuns" can't be zero before doing this division. Done?
         return ((double) overCounter / totalRuns) * 100;
+    }
+
+    public BigDecimal getReactionAverage() {
+        AppUser appUser = getCurrentUser();
+        if (appUser == null) {
+            return null;
+        }
+
+        int totalRuns = 0;
+        BigDecimal totalReactionTime = BigDecimal.ZERO;
+
+        for (Run run : runRepo.findByAppUser(appUser)) {
+            BigDecimal reaction = run.getReaction();
+            totalReactionTime = totalReactionTime.add(reaction);
+            totalRuns++;
+        }
+
+        if (totalRuns == 0) {
+            return null;
+        }
+
+        return totalReactionTime.divide(BigDecimal.valueOf(totalRuns), 4, RoundingMode.HALF_UP);
     }
 }

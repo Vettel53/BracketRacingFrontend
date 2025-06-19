@@ -4,6 +4,8 @@ import com.example.application.security.SecurityService;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.charts.ChartOptions;
+import com.vaadin.flow.component.charts.themes.LumoDarkTheme;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
@@ -27,6 +29,8 @@ public class MainView extends AppLayout {
 
     public MainView(SecurityService securityService) {
         this.securityService = securityService;
+        // Set chart themes globally to dark mode
+        ChartOptions.get().setTheme(new LumoDarkTheme());
 
         // Maybe rewrite this to make it cleaner
         DrawerToggle toggle = new DrawerToggle();

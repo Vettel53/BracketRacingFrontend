@@ -3,6 +3,9 @@ package com.example.application.views.dashboard.dialogs;
 import com.example.application.models.AppUser;
 import com.example.application.models.Run;
 import com.example.application.services.DashboardService;
+import com.example.application.services.FakeRunGenerationService;
+import com.example.application.views.dashboard.DashboardView;
+import com.example.application.views.dashboard.builder.DashboardBuilder;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -16,6 +19,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.spring.annotation.UIScope;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -38,6 +42,9 @@ public class AddDialog {
     TextField halfTrack;
     TextField fullTrack;
     TextField speed;
+
+    @Value("${debug.fake.runs.generation}")
+    private boolean fakeRunGenerationButton;
 
     Run createdRun;
 
@@ -63,6 +70,11 @@ public class AddDialog {
         dialog.getFooter().add(cancelRunButton);
         dialog.getFooter().add(addRunButton);
 
+        if (fakeRunGenerationButton) {
+            Button fakeRunButton = buildFakeGenerationButton(loggedInAppUser);
+            dialog.getFooter().add(fakeRunButton);
+        }
+
         dialog.open();
 
         // Add event listener to save button
@@ -70,7 +82,6 @@ public class AddDialog {
         addRunButton.addClickListener(event -> {
             // Create Run object from form data
             // USE THIS IN PRODUCTION FOR RUN TO BE CONSTRUCTED USING THE FORM FIELDS
-            // TOOD: Error handling when any field is null
 
             if (checkIfFieldsAreNull()) {
                 return;
@@ -91,10 +102,11 @@ public class AddDialog {
                     new BigDecimal(fullTrack.getValue()),
                     new BigDecimal(speed.getValue())
             );
+            System.out.println(timePicker.getValue());
             dashboardService.constructRunEntry(createdRun);
 
             // Save the fake Run to the database
-            // createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
+            //createdRun = dashboardService.constructFakeRunEntry(loggedInAppUser);
             if (createdRun == null) {
                 Notification.show("Weather API down, please try again later...");
                 return;
@@ -115,6 +127,20 @@ public class AddDialog {
             dialog.close();
             Notification.show("Cancelled adding run", 3000, Notification.Position.TOP_CENTER);
         });
+    }
+
+    private Button buildFakeGenerationButton(AppUser loggedInAppUser) {
+        Button fakeRunsButton = new Button("Generate Fake Batch Runs");
+        fakeRunsButton.addClickListener(event -> {
+            for (int i = 0; i < 5; i++) {
+                // Generate the fake run then refresh the grid
+                Run fakeRun = FakeRunGenerationService.generateFakeRun(loggedInAppUser);
+                dashboardService.constructRunEntry(fakeRun);
+                dashboardService.callUpdateGrid(fakeRun);
+            }
+        });
+
+        return fakeRunsButton;
     }
 
     private boolean checkIfFieldsAreNull() {

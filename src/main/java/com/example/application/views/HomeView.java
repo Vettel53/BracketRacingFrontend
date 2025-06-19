@@ -329,10 +329,11 @@ public class HomeView extends VerticalLayout {
         imagePlaceholder.getStyle().set("justify-content", "center");
         if (imageName != null) { // if image was specified
             Image image = new Image("images/" + imageName, imageName);
-            image.getStyle().set("object-fit", "fill");
+            image.getStyle().set("object-fit", "cover");
             image.getStyle().set("border-radius", "8px");
             image.setWidth("100%");
-            image.setHeight("100%");
+            image.setHeight("auto");
+            imagePlaceholder.getStyle().set("background-color", "transparent");
 
             imagePlaceholder.add(image);
         } else {

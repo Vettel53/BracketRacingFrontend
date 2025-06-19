@@ -8,6 +8,7 @@ import com.example.application.models.Run;
 import com.example.application.models.Weather;
 import com.example.application.security.SecurityService;
 import com.example.application.views.dashboard.DashboardView;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -112,7 +113,7 @@ public class DashboardService {
         runRepo.save(runToSave);
 
         // Get current track weather
-        Weather trackWeather = weatherService.getCurrentWeather(runToSave.getTrack());
+        Weather trackWeather = weatherService.getCurrentWeather(runToSave.getTrack(), runToSave.getDate(), runToSave.getTime());
 
         // Set trackWeather Run ID to created run
         trackWeather.setRun(runToSave);
